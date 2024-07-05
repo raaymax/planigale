@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" title="screenshot">
+  <img src="logo.webp" title="screenshot">
 </p>
 
 # Planigale
