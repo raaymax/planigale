@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.png" title="screenshot">
+</p>
+
 # Planigale
 
 ## Description
