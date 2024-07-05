@@ -2,11 +2,11 @@
   "imports": {
     "asserts": "https://deno.land/std@0.224.0/testing/asserts.ts",
 		"json_schema_typed": "https://deno.land/x/json_schema_typed/draft_latest.ts",
-		"qs": "https://esm.sh/qs@6.12.2",
+		"qs": "https://esm.sh/qs@6.12.2"
   },
 	"scripts": {
 		"test": "deno test --allow-net --allow-read --allow-write --unstable",
 		"lint": "deno lint --unstable",
-		"format": "deno fmt",
+		"format": "deno fmt"
 	}
 }
