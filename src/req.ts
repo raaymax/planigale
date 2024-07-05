@@ -1,4 +1,4 @@
-import qs from 'qs';
+import { qs } from './deps.ts';
 
 export type ReqInit = {
 	ip: Req['ip'],

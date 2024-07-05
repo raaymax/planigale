@@ -1,4 +1,4 @@
-import { assertEquals, assert } from "asserts";
+import { assertEquals, assert } from "https://deno.land/std@0.224.0/testing/asserts.ts";
 import { Planigale } from "./mod.ts";
 
 

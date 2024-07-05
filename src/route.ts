@@ -1,4 +1,4 @@
-import {JSONSchema} from 'json_schema_typed';
+import {JSONSchema} from './deps.ts';
 import { Ajv, ValidateFunction } from "npm:ajv";
 import {ValidationFailed } from './errors.ts';
 import { Req } from './req.ts';
