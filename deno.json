@@ -1,4 +1,7 @@
-{
+{ 
+	"name": "@codecat/planigale",
+  "version": "0.1.0",
+  "exports": "./mod.ts",
   "imports": {
     "asserts": "https://deno.land/std@0.224.0/testing/asserts.ts",
     "json_schema_typed": "https://deno.land/x/json_schema_typed/draft_latest.ts",

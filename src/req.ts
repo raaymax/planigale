@@ -11,6 +11,7 @@ export type ReqInit = {
 
 export class Req {
   ip: Deno.NetAddr | string = '';
+	context?: any; 
   method: string;
   url: string;
   path: string;

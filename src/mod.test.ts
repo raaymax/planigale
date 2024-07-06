@@ -1,5 +1,5 @@
-import { assertEquals, assert } from "https://deno.land/std@0.224.0/testing/asserts.ts";
-import { Planigale } from "./mod.ts";
+import { assertEquals, assert } from "./dev_deps.ts";
+import { Planigale, Router } from "./mod.ts";
 
 
 Deno.test("Basic functions", async () => {
@@ -230,4 +230,94 @@ Deno.test("Middlewares", async () => {
   assertEquals(res.status, 200);
   assertEquals(await res.json(), { ok: "middleware" });
   assertEquals(res.headers.get("x-middleware"), "true");
+})
+
+Deno.test("Routers", async () => {
+  const app = new Planigale();
+	const router = new Router();
+	app.use('/users', router);
+	app.use(async (req, res, next) => {
+		req.state.app = true;
+		await next();
+	});
+	router.use(async (req, res, next) => {
+		req.state.router = true;
+		await next();
+	});
+  router.route({
+    method: "GET",  
+    url: "/:id",
+    schema: {},
+    handler: async (req, res) => {
+			assertEquals(req.state.app, true);
+			assertEquals(req.state.router, true);
+      res.send({ok: true});
+    }
+  })
+  const req = new Request("http://localhost/users/1", {
+    method: "GET",
+  });
+  const res = await app.handle(req);
+  assertEquals(res.status, 200);
+	assertEquals(await res.json(), { ok: true });
+})
+
+Deno.test("Routers with different middlewares", async () => {
+  const app = new Planigale();
+	const router = new Router();
+	app.use('/users', router);
+	app.use(async (req, res, next) => {
+		req.state.app = true;
+		await next();
+	});
+	router.use(async (req, res, next) => {
+		req.state.router = true;
+		await next();
+	});
+  router.route({
+    method: "GET",  
+    url: "/:id",
+    schema: {},
+    handler: async (req, res) => {
+			assertEquals(req.state.app, true);
+			assertEquals(req.state.router, true);
+      res.send({ok: true});
+    }
+  })
+	app.route({
+		method: "GET",  
+		url: "/ping",
+		schema: {},
+		handler: async (req, res) => {
+			assertEquals(req.state.app, true);
+			assert(!req.state.router);
+			res.send({ok: true});
+		}
+	})
+  const req = new Request("http://localhost/ping", {
+    method: "GET",
+  });
+  const res = await app.handle(req);
+  assertEquals(res.status, 200);
+	assertEquals(await res.json(), { ok: true });
+})
+
+Deno.test("Parse params from mount point", async () => {
+  const app = new Planigale();
+	const router = new Router();
+	app.use('/users/:userId', router);
+  router.route({
+    method: "GET",  
+    url: "/details",
+    schema: {},
+    handler: async (req, res) => {
+			assertEquals(req.params.userId, 'test');
+      res.send({ok: true});
+    }
+  })
+  const req = new Request("http://localhost/users/test/details", {
+    method: "GET",
+  });
+  const res = await app.handle(req);
+  assertEquals(res.status, 200);
 })

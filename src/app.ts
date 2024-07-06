@@ -1,35 +1,34 @@
 import { InternalServerError, ResourceNotFound, ApiError } from './errors.ts';
-import { Route, RouteDef } from './route.ts';
+import { Router, Next } from './route.ts';
+import { Context } from './context.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
 
-export type Next = () => void | Promise<void>;
-export type Middleware = (req: Req, res: Res, next: Next) => void | Promise<void>;
 
 export class Planigale {
-  #routes: Route[] = [];
-  #middlewares: Middleware[] = [];
+	#router = new Router();
 
-  use(middleware: Middleware) {
-    this.#middlewares.push(middleware);
-  }
-
-  route(def: RouteDef): Route {
-    const route = new Route(def); 
-    this.#routes.push(route);
-		return route;
-  }
+	use = this.#router.use.bind(this.#router);
+	route = this.#router.route.bind(this.#router);
 
   async handle(
     request: Request,
     info?: Deno.ServeHandlerInfo
   ): Promise<Response> {
 		try {
-			const route = this.#routes.find((route) => route.match(request));
-			if (!route) {
+			const req = await Req.fromRequest(request, info);
+			const res = new Res();
+			const ctx = this.#router.find(req, new Context());
+			if(!ctx) {
 				throw new ResourceNotFound("Resource not found");
 			}
-      return await this.#handleRoute(route, request, info);
+			ctx.preProcess(req);
+			await ctx.route.validate(req);
+
+			await ctx.getRoutes().map(r=>r.getMiddlewares()).flat().reduce<Next>((acc, middleware) => {
+				return async () => await middleware(req, res, acc);
+			}, async () => await ctx.route.handle(req, res))();
+			return res.serialize();
     } catch(e) {
 			return this.#handleErrors(e);
     }
@@ -47,18 +46,6 @@ export class Planigale {
 
   serve(opts: Deno.ServeOptions): Deno.HttpServer<Deno.NetAddr> {
     return Deno.serve(opts, this.handle.bind(this));
-  }
-
-  async #handleRoute(route: Route, request: Request, info?: Deno.ServeHandlerInfo) {
-    const req = await Req.fromRequest(request, info);
-		route.preProcess(req);
-    await route.validate(req);
-    const res = new Res();
-
-    await this.#middlewares.reduce<Next>((acc, middleware) => {
-      return async () => await middleware(req, res, acc);
-    }, async () => await route.handler(req, res))();
-    return res.serialize();
   }
 };
 

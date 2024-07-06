@@ -49,6 +49,7 @@ export class InternalServerError extends ApiError {
 }
 
 export class ResourceNotFound extends ApiError {
+	log: boolean = false;
 	constructor(message: string) {
 		super(404, 'RESOURCE_NOT_FOUND', message);
 	}
