@@ -4,9 +4,9 @@
   "exports": "./mod.ts",
   "imports": {
     "asserts": "jsr:@std/assert",
-    "json-schema": "npm:@types/json-schema",
-    "qs": "npm:qs",
-		"ajv": "npm:ajv",
+    "json-schema": "npm:@types/json-schema@^7.0.15",
+    "qs": "npm:qs@^6.12.2",
+		"ajv": "npm:ajv@^8.16.0",
   },
   "scripts": {
     "test": "deno test --allow-net --allow-read --allow-write --unstable",

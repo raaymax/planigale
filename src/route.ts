@@ -1,4 +1,4 @@
-import {JSONSchema} from 'json-schema';
+import {JSONSchema7 as JSONSchema} from 'json-schema';
 import { Ajv, ValidateFunction } from "ajv";
 import { ValidationFailed } from './errors.ts';
 import { Req } from './req.ts';
@@ -70,7 +70,7 @@ export class Route extends BaseRoute {
 		};
 	}
 
-	get method() {
+	get method(): string[] {
 		return [this.definition.method].flat();
 	}
 

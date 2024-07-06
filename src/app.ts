@@ -1,5 +1,6 @@
 import { InternalServerError, ResourceNotFound, ApiError } from './errors.ts';
-import { Router, Next } from './route.ts';
+import { Router } from './route.ts';
+import type { Next, Middleware, BaseRoute, Route, RouteDef } from './route.ts';
 import { Context } from './context.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
@@ -8,8 +9,20 @@ import { Res } from './res.ts';
 export class Planigale {
 	#router = new Router();
 
-	use = this.#router.use.bind(this.#router);
-	route = this.#router.route.bind(this.#router);
+	use(url: string, router: BaseRoute): void;
+	use(middleware: Middleware): void;
+	use(arg: string | Middleware, arg2?: BaseRoute): void {
+		if (typeof arg === 'function') {
+			this.#router.use(arg);
+		} else {
+			if(!arg2) throw new Error('Router must be provided');
+			this.#router.use(arg, arg2);
+		}
+	}
+
+	route(def: RouteDef): Route {
+		return this.#router.route(def);
+	}
 
   async handle(
     request: Request,

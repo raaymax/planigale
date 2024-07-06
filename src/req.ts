@@ -21,14 +21,14 @@ export class Req {
   body: any;
   state: Record<string, any> = {};
 
-	static async from(url: string, {state, ...opts}: RequestInit & {state: Record<string, any>}) {
+	static async from(url: string, {state, ...opts}: RequestInit & {state: Record<string, any>}): Promise<Req> {
 		const request = new Request(url, opts);
 		const req = await Req.fromRequest(request);
 		req.state = state;
 		return req;
 	}
 
-  static async fromRequest(request: Request, info?: Deno.ServeHandlerInfo) {
+  static async fromRequest(request: Request, info?: Deno.ServeHandlerInfo): Promise<Req> {
     const url = new URL(request.url);
     return new Req(request, {
       ip: info?.remoteAddr ?? "",

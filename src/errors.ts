@@ -9,7 +9,7 @@ export class ApiError extends Error {
 		this.errorCode = errorCode;
 	};
 
-	serialize() {
+	serialize(): Record<string, any> {
 		return {
 			errorCode: this.errorCode,
 			message: this.message,
@@ -25,7 +25,7 @@ export class ValidationFailed extends ApiError {
     this.errors = errors;
   }
 
-	serialize() {
+	serialize(): Record<string, any> {
 		return {
 			...super.serialize(),
 			errors: this.errors,
@@ -40,7 +40,7 @@ export class InternalServerError extends ApiError {
 		this.originalError = e;
 	}
 
-	serialize() {
+	serialize(): Record<string, any> {
 		return {
 			...super.serialize(),
 			stack: this.originalError.stack,
