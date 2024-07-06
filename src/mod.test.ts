@@ -1,4 +1,4 @@
-import { assertEquals, assert } from "./dev_deps.ts";
+import { assertEquals, assert } from "asserts";
 import { Planigale, Router } from "./mod.ts";
 
 

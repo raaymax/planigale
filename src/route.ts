@@ -1,6 +1,6 @@
-import {JSONSchema} from './deps.ts';
-import { Ajv, ValidateFunction } from "npm:ajv";
-import { ResourceNotFound, ValidationFailed } from './errors.ts';
+import {JSONSchema} from 'json-schema';
+import { Ajv, ValidateFunction } from "ajv";
+import { ValidationFailed } from './errors.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
 import { Context, EndContext } from './context.ts';
