@@ -5,6 +5,7 @@ import { Context } from './context.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
 import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
+import * as Compat from './compat/mod.ts';
 
 /**
  * @module Planigale
