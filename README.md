@@ -4,16 +4,44 @@
 
 # Planigale
 
+> [!CAUTION]
+> This project is under heavy development and is not ready for production use.
+> Please, do not use it yet.
+
+
 ## Description
 
 Minimalistic HTTP framework for Deno
 
 ## Usage
 
+### Deno
+Planigale is available on both deno.land/x and JSR.
+For deno.land/x use the following import:
+```typescript
+import { Planigale } from "https://deno.land/x/planigale/mod.ts";
+```
+For JSR use the following import:
+```typescript
+import { Planigale } from "jsr:@codecat/planigale";
+```
+
+### NPM
+
+Planigale is also available on NPM. To use it, you need to install it first:
+```bash
+npm install planigale
+```
+Then you can import it in your project:
+```typescript
+import { Planigale } from "planigale";
+```
+
+
 ### Basic example
 
 ```typescript
-import { Planigale } from "https://deno.land/x/planigale/mod.ts";
+import { Planigale } from "@codecat/planigale";
 
 const app = new Planigale();
 
@@ -153,7 +181,7 @@ TBA
 ### Unit testing
 Planigale is designed to be easily testable. You can test your handlers without running the server.
 ```typescript
-import { Planigale } from "https://deno.land/x/planigale/mod.ts";
+import { Planigale } from "@codecat/planigale";
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
 const app = new Planigale();

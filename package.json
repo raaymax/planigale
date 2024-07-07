@@ -1,0 +1,24 @@
+{
+  "name": "planigale",
+  "version": "0.1.2",
+  "description": "Minimalistic HTTP framework inspired by express and fastify",
+  "main": "mod.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raaymax/planigale.git"
+  },
+  "keywords": [
+    "http",
+    "framework",
+    "sse"
+  ],
+  "author": "Mateusz Russak <mateusz@russak.biz>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/raaymax/planigale/issues"
+  },
+  "homepage": "https://github.com/raaymax/planigale#readme"
+}
