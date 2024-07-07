@@ -3,23 +3,24 @@
   "version": "0.1.4",
   "exports": "./mod.ts",
   "imports": {
-    "@deno/dnt": "../../ThirdParty/dnt/mod.ts",
-    "ajv": "npm:ajv@^8.16.0",
-    "json-schema": "npm:@types/json-schema@^7.0.15",
-    "qs": "npm:qs@^6.12.2",
     "@deno/cache-dir": "jsr:@deno/cache-dir@^0.8.0",
+    "@deno/dnt": "../../ThirdParty/dnt/mod.ts",
     "@std/assert": "jsr:@std/assert@^0.218.2",
     "@std/fmt": "jsr:@std/fmt@^0.218.2",
     "@std/fs": "jsr:@std/fs@^0.218.2",
+    "@std/http": "jsr:@std/http@^0.224.5",
     "@std/path": "jsr:@std/path@^0.218.2",
     "@ts-morph/bootstrap": "npm:@ts-morph/bootstrap@0.22",
-    "code-block-writer": "npm:code-block-writer@^13.0.1"
+    "ajv": "npm:ajv@^8.16.0",
+    "code-block-writer": "npm:code-block-writer@^13.0.1",
+    "json-schema": "npm:@types/json-schema@^7.0.15",
+    "qs": "npm:qs@^6.12.2"
   },
   "tasks": {
     "version": "deno run -A scripts/version.ts",
     "build": "deno run -A scripts/build_npm.ts",
-		"publish": "deno publish && cd npm && npm publish",
-		"test": "deno test -A && deno task build"
+    "publish": "deno publish && cd npm && npm publish",
+    "test": "deno test -A && deno task build"
   },
   "test": {
     "exclude": [

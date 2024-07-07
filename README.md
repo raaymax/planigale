@@ -32,6 +32,9 @@ deno add @codecat/planigale
 
 ### NPM
 
+> [!CAUTION]
+> Node compatibility is not yet implemented.
+
 Planigale is also available on NPM. To use it, you need to install it first:
 ```bash
 npm install planigale

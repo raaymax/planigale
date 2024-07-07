@@ -3,7 +3,7 @@ import assert from 'node:assert';
 
 Deno.test('Basic functions', async () => {
   const app = new Planigale();
-  const srv = await app.serve({ port: 8000 });
+  const srv = await app.serve({ port: 0 });
   const baseUrl = `http://localhost:${srv.addr.port}`;
 
   app.route({

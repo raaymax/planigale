@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import qs from 'qs';
 import { ServeHandlerInfo } from './types.ts';
+import { getCookies, setCookie, deleteCookie, Cookie} from '@std/http';
 
 export type ReqInit = {
   ip: Req['ip'];
@@ -9,7 +10,24 @@ export type ReqInit = {
   query: Req['query'];
   headers: Req['headers'];
   body: Req['body'];
+	cookies: Req['cookies'];
 };
+
+
+type SetCookieOptions = Omit<Cookie, 'name' | 'value'>;
+
+class Cookies {
+	constructor(private headers: Headers) {}
+	get(name: string): string | undefined {
+		return getCookies(this.headers)?.[name];
+	}
+	set(name: string, value: string, options: SetCookieOptions): void {
+		setCookie(this.headers, { name, value, ...options });
+	}
+	delete(name: string): void {
+		deleteCookie(this.headers, name);
+	}
+}
 
 export class Req {
   ip: Deno.NetAddr | string = '';
@@ -17,6 +35,7 @@ export class Req {
   method: string;
   url: string;
   path: string;
+	cookies: Cookies;
   params: Record<string, any>;
   query: Record<string, any>;
   headers: Record<string, string>;
@@ -36,6 +55,7 @@ export class Req {
       ip: info?.remoteAddr ?? '',
       path: url.pathname,
       params: {},
+			cookies: new Cookies(request.headers),
       query: qs.parse(url.search.slice(1)),
       headers: Object.fromEntries(request.headers.entries()),
       body: request.body ? await request.json() : {},
@@ -49,6 +69,7 @@ export class Req {
     query,
     headers,
     body,
+		cookies,
   }: ReqInit) {
     this.ip = ip;
     this.method = request.method;
@@ -58,5 +79,6 @@ export class Req {
     this.query = query;
     this.headers = headers;
     this.body = body;
+		this.cookies = cookies;
   }
 }

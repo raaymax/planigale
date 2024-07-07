@@ -54,11 +54,19 @@ export const serve = (serveOpts: ServeOptions, handler: ServeHandler): HttpServe
         const blob = await response.blob();
         res.write(Buffer.from(await blob.arrayBuffer()));
         res.end();
-      }).catch((e) => opts.onError && opts.onError(e));
+      }).catch((e) => {
+				console.error(e);
+				opts.onError && opts.onError(e);
+			});
     });
-    srv.on('clientError', (_err, socket) => {
+		srv.on('error', (e) => {
+			console.error(e);
+		})
+    srv.on('clientError', (err, socket) => {
+			console.error(err);
       socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
     });
+
     srv.listen(opts.port);
 
     return resolve(srv);

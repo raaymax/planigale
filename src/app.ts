@@ -5,7 +5,6 @@ import { Context } from './context.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
 import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
-import { serve } from './compat/mod.ts';
 
 /**
  * @module Planigale
@@ -95,7 +94,7 @@ export class Planigale extends Router {
 
   async serve(opts?: ServeOptions): Promise<HttpServer<Deno.NetAddr>> {
     if (!opts) opts = {};
-    return serve(opts, this.handle);
+    return Compat.serve(opts, this.handle);
   }
 
   #handleErrors(e: Error) {
