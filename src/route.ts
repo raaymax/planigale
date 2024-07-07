@@ -122,7 +122,8 @@ export class Router extends BaseRoute {
 	/** This method is used to add a new route or router to the server under specific mount point url.
 		* @param url - The mount point of the route or router.
 		* @param router - The router or route to be added to the server.
-		* @example
+		* @example 
+		* ```ts
 		* const app = new Planigale();
 		* const router = new Router();
 		* app.use('/api', router);
@@ -130,16 +131,19 @@ export class Router extends BaseRoute {
 		* const request = new Request('http://localhost:8000/api/hello', {method: 'GET'});
 		* const response = await app.handle(request);
 		* console.log(response);
+		* ```
 		*/
 	use(url: string, router: BaseRoute): void;
 	/** This method is used to add a new middleware to the server.
 		* @example
+		*	```ts
 		* const app = new Planigale();
 		* app.use(async (req, res, next) => {
 		*   console.log('before');
 		*   await next();
 		*   console.log('after');
 		* });
+		* ```
 		*/
 	use(middleware: Middleware): void;
 	use(arg: string | Middleware, arg2?: BaseRoute): void {
@@ -154,12 +158,14 @@ export class Router extends BaseRoute {
 	/** This method is used to create a new route. It will return a Route object.
 		* You can use this method to create a new route and add it to the server.
 		* @example
+		* ```ts
 		* const app = new Planigale();
 		* const route = app.route({
 		*   url: '/',
 		*   method: 'GET',
 		*   handler: (req, res) => res.send('Hello World!')
 		* });
+		* ```
 		*/
 	route(def: RouteDef): Route {
 		const route = new Route(def); 
