@@ -1,17 +1,17 @@
 import qs from 'qs';
 
 export type ReqInit = {
-	ip: Req['ip'],
-	path: Req['path'],
-	params: Req['params'],
-	query: Req['query'],
-	headers: Req['headers'],
-	body: Req['body'],
+  ip: Req['ip'];
+  path: Req['path'];
+  params: Req['params'];
+  query: Req['query'];
+  headers: Req['headers'];
+  body: Req['body'];
 };
 
 export class Req {
   ip: Deno.NetAddr | string = '';
-	context?: any; 
+  context?: any;
   method: string;
   url: string;
   path: string;
@@ -21,17 +21,17 @@ export class Req {
   body: any;
   state: Record<string, any> = {};
 
-	static async from(url: string, {state, ...opts}: RequestInit & {state: Record<string, any>}): Promise<Req> {
-		const request = new Request(url, opts);
-		const req = await Req.fromRequest(request);
-		req.state = state;
-		return req;
-	}
+  static async from(url: string, { state, ...opts }: RequestInit & { state: Record<string, any> }): Promise<Req> {
+    const request = new Request(url, opts);
+    const req = await Req.fromRequest(request);
+    req.state = state;
+    return req;
+  }
 
   static async fromRequest(request: Request, info?: Deno.ServeHandlerInfo): Promise<Req> {
     const url = new URL(request.url);
     return new Req(request, {
-      ip: info?.remoteAddr ?? "",
+      ip: info?.remoteAddr ?? '',
       path: url.pathname,
       params: {},
       query: qs.parse(url.search.slice(1)),
@@ -41,8 +41,13 @@ export class Req {
   }
 
   constructor(public request: Request, {
-    ip, path, params, query, headers, body
-  }: ReqInit ) {
+    ip,
+    path,
+    params,
+    query,
+    headers,
+    body,
+  }: ReqInit) {
     this.ip = ip;
     this.method = request.method;
     this.url = request.url;

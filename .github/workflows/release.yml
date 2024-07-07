@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 permissions:
   contents: write
@@ -14,9 +14,15 @@ jobs:
     outputs:
       release_created: ${{steps.release.outputs.release_created}}
     steps:
-      - uses: google-github-actions/release-please-action@v3
-        id: release
+      - uses: denoland/setup-deno@v1
         with:
-          release-type: node
-          token: ${{secrets.GITHUB_TOKEN}}
-          command: manifest
+          deno-version: canary
+
+      - uses: actions/checkout@v4
+
+      - name: Linting
+        run: deno lint
+
+      - name: Run tests
+        run: deno test -A
+

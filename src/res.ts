@@ -1,8 +1,7 @@
-
 export class Res {
   body: unknown;
   status: number = 200;
-  headers: Headers = new Headers( { "Content-Type": "application/json" });
+  headers: Headers = new Headers({ 'Content-Type': 'application/json' });
 
   send(data: unknown): Res {
     this.body = data;
@@ -16,4 +15,3 @@ export class Res {
     });
   }
 }
-
