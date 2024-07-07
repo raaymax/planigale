@@ -10,6 +10,7 @@
   },
 	"lint": {
     "include": ["src/"],
+		"exclude": ["src/**/*.test.ts"],
     "rules": {
       "tags": ["recommended"],
       "include": [],

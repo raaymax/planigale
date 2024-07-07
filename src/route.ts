@@ -24,7 +24,7 @@ export class BaseRoute {
     this.#middlewares.push(middleware);
   }
   /** @ignore */
-  find(req: Req, ctx: Context): EndContext | undefined {
+  find(_req: Req, _ctx: Context): EndContext | undefined {
     return undefined;
   }
   getMiddlewares(): Middleware[] {
@@ -45,6 +45,15 @@ export type RouteDef = {
     response?: JSONSchema;
   };
   handler: Handler;
+};
+type ValidationBlock = 'body' | 'params' | 'query' | 'headers';
+type ValidationError = { 
+	block: ValidationBlock; 
+	instancePath: string;
+	keyword: string;
+	message?: string;
+	params: Record<string, unknown>;
+	schemaPath: string
 };
 
 export class Route extends BaseRoute {
@@ -86,32 +95,36 @@ export class Route extends BaseRoute {
   }
 
   async validate(req: Req) {
-    let errors: any = await Promise.all([
+    const errors: ValidationError[][] = await Promise.all([
       this.#validateBlock('body', req),
       this.#validateBlock('params', req),
       this.#validateBlock('query', req),
       this.#validateBlock('headers', req),
     ]);
-    errors = errors.flat().filter((e: any) => e !== null);
-    if (errors.length) {
-      throw new ValidationFailed(errors);
+    const fmtErrors: ValidationError[] = errors.flat().filter((e: ValidationError) => e !== null);
+    if (fmtErrors.length) {
+      throw new ValidationFailed(fmtErrors);
     }
     return;
   }
 
-  async #validateBlock(block: keyof Route['validation'], req: any) {
+  async #validateBlock(block: ValidationBlock, req: Req) {
     const validate = this.validation[block];
     if (validate) {
-      const validationResult: any = validate(req[block]);
+      const validationResult: unknown = validate(req[block]);
 
       if (validationResult instanceof Promise) {
         try {
           await validationResult;
         } catch (e) {
-          return e.map((e: any) => ({ ...e, block: block }));
+          return e.map((e: ValidationError) => ({ ...e, block: block }));
         }
       } else if (!validationResult) {
-        return validate.errors?.map((e: any) => ({ ...e, block: block })) ?? [];
+        return validate.errors
+					?.map<ValidationError>((e) => ({
+						...e,
+						block: block,
+					})) ?? [];
       }
     }
     return null;

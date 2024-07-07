@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-please:
+  QA:
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{steps.release.outputs.release_created}}
@@ -23,6 +23,6 @@ jobs:
       - name: Linting
         run: deno lint
 
-      - name: Run tests
+      - name: Testing
         run: deno test -A
 

@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import qs from 'qs';
 
 export type ReqInit = {
@@ -17,11 +18,11 @@ export class Req {
   path: string;
   params: Record<string, any>;
   query: Record<string, any>;
-  headers: Record<string, any>;
+  headers: Record<string, string>;
   body: any;
-  state: Record<string, any> = {};
+  state: any = {};
 
-  static async from(url: string, { state, ...opts }: RequestInit & { state: Record<string, any> }): Promise<Req> {
+  static async from(url: string, { state, ...opts }: RequestInit & { state: any }): Promise<Req> {
     const request = new Request(url, opts);
     const req = await Req.fromRequest(request);
     req.state = state;
