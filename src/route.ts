@@ -47,13 +47,13 @@ export type RouteDef = {
   handler: Handler;
 };
 type ValidationBlock = 'body' | 'params' | 'query' | 'headers';
-type ValidationError = { 
-	block: ValidationBlock; 
-	instancePath: string;
-	keyword: string;
-	message?: string;
-	params: Record<string, unknown>;
-	schemaPath: string
+type ValidationError = {
+  block: ValidationBlock;
+  instancePath: string;
+  keyword: string;
+  message?: string;
+  params: Record<string, unknown>;
+  schemaPath: string;
 };
 
 export class Route extends BaseRoute {
@@ -121,10 +121,10 @@ export class Route extends BaseRoute {
         }
       } else if (!validationResult) {
         return validate.errors
-					?.map<ValidationError>((e) => ({
-						...e,
-						block: block,
-					})) ?? [];
+          ?.map<ValidationError>((e) => ({
+            ...e,
+            block: block,
+          })) ?? [];
       }
     }
     return null;

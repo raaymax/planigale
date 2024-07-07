@@ -1,29 +1,41 @@
-import { assert, assertEquals } from 'asserts';
-import { Planigale, Router } from './mod.ts';
+import { Next, Planigale, Req, Res, Router } from './mod.ts';
+import assert from 'node:assert';
 
 Deno.test('Basic functions', async () => {
   const app = new Planigale();
+  const srv = await app.serve({ port: 8000 });
+  const baseUrl = `http://localhost:${srv.addr.port}`;
+
   app.route({
     method: 'GET',
     url: '/users/:id',
     schema: {},
-    handler: (req, res) => {
-      assertEquals(req.params.id, 'oko');
-      assertEquals(req.query.sad, '123');
-      assertEquals(req.query.zxc, '432');
-      assertEquals(req.url, 'http://localhost/users/oko?sad=123&zxc=432');
-      assertEquals(req.method, 'GET');
-      assertEquals(req.path, '/users/oko');
+    handler: (req: Req, res: Res) => {
+      assert.deepEqual(req.params.id, 'oko');
+      assert.deepEqual(req.query.sad, '123');
+      assert.deepEqual(req.query.zxc, '432');
+      assert.deepEqual(req.url, `${baseUrl}/users/oko?sad=123&zxc=432`);
+      assert.deepEqual(req.method, 'GET');
+      assert.deepEqual(req.path, '/users/oko');
       res.send({ ok: true });
     },
   });
-  const req = new Request('http://localhost/users/oko?sad=123&zxc=432', {
+
+  const req = new Request(`${baseUrl}/users/oko?sad=123&zxc=432`, {
     method: 'GET',
   });
-  const res = await app.handle(req);
-  assertEquals(res.status, 200);
-  assertEquals(res.headers.get('content-type'), 'application/json');
-  assertEquals(await res.json(), { ok: true });
+  try {
+    const res = await fetch(req);
+    assert.deepEqual(res.status, 200);
+    assert.deepEqual(res.headers.get('content-type'), 'application/json');
+    assert.deepEqual(await res.json(), { ok: true });
+  } catch (e) {
+    console.log(e);
+    console.log(e.cause);
+    throw e;
+  } finally {
+    srv.shutdown();
+  }
 });
 
 Deno.test('Body validation', async () => {
@@ -40,8 +52,8 @@ Deno.test('Body validation', async () => {
         },
       },
     },
-    handler: async (req, res) => {
-      assertEquals(req.body.data, 'oko');
+    handler: async (req: Req, res: Res) => {
+      assert.deepEqual(req.body.data, 'oko');
       res.send({ ok: true });
     },
   });
@@ -50,8 +62,8 @@ Deno.test('Body validation', async () => {
     body: JSON.stringify({ data: 'oko' }),
   });
   const res = await app.handle(req);
-  assertEquals(res.status, 200);
-  assertEquals(await res.json(), { ok: true });
+  assert.deepEqual(res.status, 200);
+  assert.deepEqual(await res.json(), { ok: true });
 });
 
 Deno.test('Body validation failed', async () => {
@@ -69,8 +81,8 @@ Deno.test('Body validation failed', async () => {
         },
       } as const,
     },
-    handler: async (_req, _res) => {
-      assert(false);
+    handler: async (_req: Req, _res) => {
+      throw new Error('Should not be called');
     },
   });
   const req = new Request('http://localhost/body', {
@@ -78,8 +90,8 @@ Deno.test('Body validation failed', async () => {
     body: JSON.stringify({ other: 'oko', asd: 'zxc' }),
   });
   const res = await app.handle(req);
-  assertEquals(res.status, 400);
-  assertEquals(await res.json(), {
+  assert.deepEqual(res.status, 400);
+  assert.deepEqual(await res.json(), {
     errorCode: 'VALIDATION_ERROR',
     message: 'Validation failed',
     errors: [
@@ -145,8 +157,8 @@ Deno.test('Validation error aggregation', async () => {
         },
       },
     },
-    handler: async (_req, _res) => {
-      assert(false);
+    handler: async (_req: Req, _res) => {
+      throw new Error('Should not be called');
     },
   });
   const req = new Request('http://localhost/validation/asd?asd=test', {
@@ -157,8 +169,8 @@ Deno.test('Validation error aggregation', async () => {
     },
   });
   const res = await app.handle(req);
-  assertEquals(res.status, 400);
-  assertEquals(await res.json(), {
+  assert.deepEqual(res.status, 400);
+  assert.deepEqual(await res.json(), {
     errorCode: 'VALIDATION_ERROR',
     message: 'Validation failed',
     errors: [
@@ -208,7 +220,7 @@ Deno.test('Validation error aggregation', async () => {
 
 Deno.test('Middlewares', async () => {
   const app = new Planigale();
-  app.use(async (req, res, next) => {
+  app.use(async (req: Req, res: Res, next: Next) => {
     req.state.data = 'middleware';
     await next();
     res.headers.set('x-middleware', 'true');
@@ -217,7 +229,7 @@ Deno.test('Middlewares', async () => {
     method: 'GET',
     url: '/users/:id',
     schema: {},
-    handler: async (req, res) => {
+    handler: async (req: Req, res: Res) => {
       res.send({ ok: req.state.data });
     },
   });
@@ -225,20 +237,20 @@ Deno.test('Middlewares', async () => {
     method: 'GET',
   });
   const res = await app.handle(req);
-  assertEquals(res.status, 200);
-  assertEquals(await res.json(), { ok: 'middleware' });
-  assertEquals(res.headers.get('x-middleware'), 'true');
+  assert.deepEqual(res.status, 200);
+  assert.deepEqual(await res.json(), { ok: 'middleware' });
+  assert.deepEqual(res.headers.get('x-middleware'), 'true');
 });
 
 Deno.test('Routers', async () => {
   const app = new Planigale();
   const router = new Router();
   app.use('/users', router);
-  app.use(async (req, _res, next) => {
+  app.use(async (req: Req, _res: Res, next: Next) => {
     req.state.app = true;
     await next();
   });
-  router.use(async (req, _res, next) => {
+  router.use(async (req: Req, _res: Res, next: Next) => {
     req.state.router = true;
     await next();
   });
@@ -246,9 +258,9 @@ Deno.test('Routers', async () => {
     method: 'GET',
     url: '/:id',
     schema: {},
-    handler: async (req, res) => {
-      assertEquals(req.state.app, true);
-      assertEquals(req.state.router, true);
+    handler: async (req: Req, res: Res) => {
+      assert.deepEqual(req.state.app, true);
+      assert.deepEqual(req.state.router, true);
       res.send({ ok: true });
     },
   });
@@ -256,19 +268,19 @@ Deno.test('Routers', async () => {
     method: 'GET',
   });
   const res = await app.handle(req);
-  assertEquals(res.status, 200);
-  assertEquals(await res.json(), { ok: true });
+  assert.deepEqual(res.status, 200);
+  assert.deepEqual(await res.json(), { ok: true });
 });
 
 Deno.test('Routers with different middlewares', async () => {
   const app = new Planigale();
   const router = new Router();
   app.use('/users', router);
-  app.use(async (req, _res, next) => {
+  app.use(async (req: Req, _res: Res, next: Next) => {
     req.state.app = true;
     await next();
   });
-  router.use(async (req, _res, next) => {
+  router.use(async (req: Req, _res: Res, next: Next) => {
     req.state.router = true;
     await next();
   });
@@ -276,9 +288,9 @@ Deno.test('Routers with different middlewares', async () => {
     method: 'GET',
     url: '/:id',
     schema: {},
-    handler: async (req, res) => {
-      assertEquals(req.state.app, true);
-      assertEquals(req.state.router, true);
+    handler: async (req: Req, res: Res) => {
+      assert.deepEqual(req.state.app, true);
+      assert.deepEqual(req.state.router, true);
       res.send({ ok: true });
     },
   });
@@ -286,9 +298,9 @@ Deno.test('Routers with different middlewares', async () => {
     method: 'GET',
     url: '/ping',
     schema: {},
-    handler: async (req, res) => {
-      assertEquals(req.state.app, true);
-      assert(!req.state.router);
+    handler: async (req: Req, res: Res) => {
+      assert.deepEqual(req.state.app, true);
+      assert.deepEqual(!req.state.router, true);
       res.send({ ok: true });
     },
   });
@@ -296,8 +308,8 @@ Deno.test('Routers with different middlewares', async () => {
     method: 'GET',
   });
   const res = await app.handle(req);
-  assertEquals(res.status, 200);
-  assertEquals(await res.json(), { ok: true });
+  assert.deepEqual(res.status, 200);
+  assert.deepEqual(await res.json(), { ok: true });
 });
 
 Deno.test('Parse params from mount point', async () => {
@@ -308,8 +320,8 @@ Deno.test('Parse params from mount point', async () => {
     method: 'GET',
     url: '/details',
     schema: {},
-    handler: async (req, res) => {
-      assertEquals(req.params.userId, 'test');
+    handler: async (req: Req, res: Res) => {
+      assert.deepEqual(req.params.userId, 'test');
       res.send({ ok: true });
     },
   });
@@ -317,5 +329,5 @@ Deno.test('Parse params from mount point', async () => {
     method: 'GET',
   });
   const res = await app.handle(req);
-  assertEquals(res.status, 200);
+  assert.deepEqual(res.status, 200);
 });

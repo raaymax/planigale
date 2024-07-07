@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import qs from 'qs';
+import { ServeHandlerInfo } from './types.ts';
 
 export type ReqInit = {
   ip: Req['ip'];
@@ -29,7 +30,7 @@ export class Req {
     return req;
   }
 
-  static async fromRequest(request: Request, info?: Deno.ServeHandlerInfo): Promise<Req> {
+  static async fromRequest(request: Request, info?: ServeHandlerInfo): Promise<Req> {
     const url = new URL(request.url);
     return new Req(request, {
       ip: info?.remoteAddr ?? '',

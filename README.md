@@ -25,6 +25,10 @@ For JSR use the following import:
 ```typescript
 import { Planigale } from "jsr:@codecat/planigale";
 ```
+or add it to your import maps:
+```bash
+deno add @codecat/planigale
+```
 
 ### NPM
 

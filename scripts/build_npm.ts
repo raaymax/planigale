@@ -1,21 +1,29 @@
 import { build, emptyDir } from "@deno/dnt";
+import denoConfig from "../deno.json" with { type: "json" };
 
 await emptyDir("./npm");
 
 await build({
-  entryPoints: ["./mod.ts"],
+  entryPoints: ["./src/mod.ts"],
   outDir: "./npm",
   shims: {
     // see JS docs for overview and more options
     deno: true,
 		undici: true,
+		urlPattern: true,
   },
   package: {
     // package.json properties
     name: "planigale",
-    version: Deno.args[0],
+    version: denoConfig.version,
 		description: "Minimalistic HTTP middleware framework inspired by express and fastify",
     license: "MIT",
+		dependencies: {
+			"@types/qs": "^6.9.15",
+			qs: "^6.12.2",
+			"@types/json-schema": "^7.0.15",
+			ajv: "^8.16.0",
+		},
 		repository: {
 			type: "git",
 			url: "git+https://github.com/raaymax/planigale.git"

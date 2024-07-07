@@ -4,6 +4,8 @@ import type { Next } from './route.ts';
 import { Context } from './context.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
+import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
+import { serve } from './compat/mod.ts';
 
 /**
  * @module Planigale
@@ -58,10 +60,10 @@ export class Planigale extends Router {
    * console.log(response);
    * ```
    */
-  async handle(
+  handle = async (
     request: Request,
-    info?: Deno.ServeHandlerInfo,
-  ): Promise<Response> {
+    info?: ServeHandlerInfo,
+  ): Promise<Response> => {
     try {
       const req = await Req.fromRequest(request, info);
       const res = new Res();
@@ -79,7 +81,7 @@ export class Planigale extends Router {
     } catch (e) {
       return this.#handleErrors(e);
     }
-  }
+  };
 
   /** Serves the application using Deno.serve, it will return a Deno.HttpServer instance.
    * You can use the server to close the connection or to listen for incoming requests.
@@ -90,8 +92,10 @@ export class Planigale extends Router {
    * app.serve({ port: 8000 })
    * ```
    */
-  serve(opts: Deno.ServeOptions): Deno.HttpServer<Deno.NetAddr> {
-    return Deno.serve(opts, this.handle.bind(this));
+
+  async serve(opts?: ServeOptions): Promise<HttpServer<Deno.NetAddr>> {
+    if (!opts) opts = {};
+    return serve(opts, this.handle);
   }
 
   #handleErrors(e: Error) {

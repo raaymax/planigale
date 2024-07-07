@@ -26,3 +26,6 @@ jobs:
       - name: Testing
         run: deno test -A
 
+      - name: Build npm package
+        run: deno task build
+
