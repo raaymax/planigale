@@ -17,8 +17,9 @@
   },
   "tasks": {
     "version": "deno run -A scripts/version.ts",
-    "build": "deno run -A scripts/build_npm.ts"
-		"publish": "deno publish && cd npm && npm publish"
+    "build": "deno run -A scripts/build_npm.ts",
+		"publish": "deno publish && cd npm && npm publish",
+		"test": "deno test -A && deno task build"
   },
   "test": {
     "exclude": [

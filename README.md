@@ -279,4 +279,19 @@ Deno.test("Chaking full app", async (t) => {
 
 ```
 
+## Contributing
 
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Make your changes and add tests
+4. Run tests: `deno task test`
+5. Commit your changes: `git commit -am 'feat: add some feature'`
+    // use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
+6. Push to the branch: `git push origin my-new-feature`
+7. Submit a pull request :D
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Mateusz Russak
