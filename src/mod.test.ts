@@ -69,7 +69,7 @@ Deno.test('Body validation failed', async () => {
         },
       } as const,
     },
-    handler: async (req, res) => {
+    handler: async (_req, _res) => {
       assert(false);
     },
   });
@@ -145,7 +145,7 @@ Deno.test('Validation error aggregation', async () => {
         },
       },
     },
-    handler: async (req, res) => {
+    handler: async (_req, _res) => {
       assert(false);
     },
   });
@@ -234,11 +234,11 @@ Deno.test('Routers', async () => {
   const app = new Planigale();
   const router = new Router();
   app.use('/users', router);
-  app.use(async (req, res, next) => {
+  app.use(async (req, _res, next) => {
     req.state.app = true;
     await next();
   });
-  router.use(async (req, res, next) => {
+  router.use(async (req, _res, next) => {
     req.state.router = true;
     await next();
   });
@@ -264,11 +264,11 @@ Deno.test('Routers with different middlewares', async () => {
   const app = new Planigale();
   const router = new Router();
   app.use('/users', router);
-  app.use(async (req, res, next) => {
+  app.use(async (req, _res, next) => {
     req.state.app = true;
     await next();
   });
-  router.use(async (req, res, next) => {
+  router.use(async (req, _res, next) => {
     req.state.router = true;
     await next();
   });
