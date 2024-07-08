@@ -40,6 +40,9 @@ Deno.test('Basic functions', async () => {
 
 Deno.test('Body validation', async () => {
   const app = new Planigale();
+	const srv = await app.serve({port: 0});
+  const baseUrl = `http://localhost:${srv.addr.port}`;
+
   app.route({
     method: 'POST',
     url: '/body',
@@ -57,13 +60,14 @@ Deno.test('Body validation', async () => {
       res.send({ ok: true });
     },
   });
-  const req = new Request('http://localhost/body', {
+  const req = new Request(`${baseUrl}/body`, {
     method: 'POST',
-    body: JSON.stringify({ data: 'oko' }),
+    body: JSON.stringify({data: 'oko'}),
   });
-  const res = await app.handle(req);
+  const res = await fetch(req);
   assert.deepEqual(res.status, 200);
   assert.deepEqual(await res.json(), { ok: true });
+	srv.shutdown();
 });
 
 Deno.test('Body validation failed', async () => {

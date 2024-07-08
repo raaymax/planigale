@@ -30,6 +30,31 @@ Deno.test('Basic functions', async () => {
   assertEquals(await res.json(), { ok: true });
 });
 
+Deno.test('Reading and setting cookies', async () => {
+  const app = new Planigale();
+  app.route({
+    method: 'GET',
+    url: '/users',
+    schema: {},
+    handler: (req: Req, res: Res) => {
+			assertEquals(req.cookies.get('auth'), 'token');
+			res.cookies.set('test', 'value', { maxAge: 1000 });
+      res.send({ ok: true });
+    },
+  });
+  const req = new Request('http://localhost/users', {
+    method: 'GET',
+		headers: {
+			cookie: 'auth=token',
+		}
+  });
+  const res = await app.handle(req);
+  assertEquals(res.status, 200);
+	assertEquals(res.headers.get('set-cookie'), 'test=value; Max-Age=1000');
+  assertEquals(res.headers.get('content-type'), 'application/json');
+  assertEquals(await res.json(), { ok: true });
+});
+
 Deno.test('Body validation', async () => {
   const app = new Planigale();
   app.route({
