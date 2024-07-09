@@ -72,7 +72,6 @@ export class Planigale extends Router {
         throw new ResourceNotFound('Resource not found');
       }
       ctx.preProcess(req);
-      await ctx.route.validate(req);
 
       await ctx.getRoutes().map((r) => r.getMiddlewares()).flat().reduce<Next>((acc, middleware) => {
         return async () => await middleware(req, res, acc);

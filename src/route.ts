@@ -1,23 +1,16 @@
 import type { JSONSchema7 as JSONSchema } from 'json-schema';
-import { Ajv, type ValidateFunction } from 'ajv';
-import { ValidationFailed } from './errors.ts';
 import type { Req } from './req.ts';
 import type { Res } from './res.ts';
 import type { Context, EndContext } from './context.ts';
 
 export * from './errors.ts';
 
-const ajv = new Ajv({
-  allErrors: true,
-  useDefaults: true,
-  coerceTypes: true,
-});
-
 export type Next = () => void | Promise<void>;
 export type Middleware = (req: Req, res: Res, next: Next) => void | Promise<void>;
 export type Handler = (req: Req, res: Res) => void | Promise<void>;
 
 export class BaseRoute {
+	id: string = Math.random().toString(36).slice(2);
   #middlewares: Middleware[] = [];
 
   use(middleware: Middleware): void {
@@ -46,36 +39,15 @@ export type RouteDef = {
   };
   handler: Handler;
 };
-type ValidationBlock = 'body' | 'params' | 'query' | 'headers';
-type ValidationError = {
-  block: ValidationBlock;
-  instancePath: string;
-  keyword: string;
-  message?: string;
-  params: Record<string, unknown>;
-  schemaPath: string;
-};
 
 export class Route extends BaseRoute {
   definition: RouteDef;
-  validation: {
-    body?: ValidateFunction;
-    params?: ValidateFunction;
-    query?: ValidateFunction;
-    headers?: ValidateFunction;
-  } = {};
   handler: Handler;
 
   constructor(def: RouteDef) {
     super();
     this.definition = def;
     this.handler = def.handler;
-    this.validation = {
-      body: def.schema?.body ? ajv.compile(def.schema.body) : undefined,
-      params: def.schema?.params ? ajv.compile(def.schema.params) : undefined,
-      query: def.schema?.query ? ajv.compile(def.schema.query) : undefined,
-      headers: def.schema?.headers ? ajv.compile(def.schema.headers) : undefined,
-    };
   }
 
   get method(): string[] {
@@ -92,42 +64,6 @@ export class Route extends BaseRoute {
       return ctx.end(pattern, this);
     }
     return undefined;
-  }
-
-  async validate(req: Req) {
-    const errors: ValidationError[][] = await Promise.all([
-      this.#validateBlock('body', req),
-      this.#validateBlock('params', req),
-      this.#validateBlock('query', req),
-      this.#validateBlock('headers', req),
-    ]);
-    const fmtErrors: ValidationError[] = errors.flat().filter((e: ValidationError) => e !== null);
-    if (fmtErrors.length) {
-      throw new ValidationFailed(fmtErrors);
-    }
-    return;
-  }
-
-  async #validateBlock(block: ValidationBlock, req: Req) {
-    const validate = this.validation[block];
-    if (validate) {
-      const validationResult: unknown = validate(req[block]);
-
-      if (validationResult instanceof Promise) {
-        try {
-          await validationResult;
-        } catch (e) {
-          return e.map((e: ValidationError) => ({ ...e, block: block }));
-        }
-      } else if (!validationResult) {
-        return validate.errors
-          ?.map<ValidationError>((e) => ({
-            ...e,
-            block: block,
-          })) ?? [];
-      }
-    }
-    return null;
   }
 }
 

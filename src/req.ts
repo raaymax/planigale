@@ -1,7 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 import qs from 'qs';
 import { ServeHandlerInfo } from './types.ts';
-import { getCookies, setCookie, deleteCookie, Cookie} from '@std/http';
+import { Cookies } from './cookies.ts';
+import type { Route } from './route.ts';
 
 export type ReqInit = {
   ip: Req['ip'];
@@ -13,24 +14,9 @@ export type ReqInit = {
 	cookies: Req['cookies'];
 };
 
-
-type SetCookieOptions = Omit<Cookie, 'name' | 'value'>;
-
-class Cookies {
-	constructor(private headers: Headers) {}
-	get(name: string): string | undefined {
-		return getCookies(this.headers)?.[name];
-	}
-	set(name: string, value: string, options: SetCookieOptions): void {
-		setCookie(this.headers, { name, value, ...options });
-	}
-	delete(name: string): void {
-		deleteCookie(this.headers, name);
-	}
-}
-
 export class Req {
   ip: Deno.NetAddr | string = '';
+	route?: Route;
   context?: any;
   method: string;
   url: string;
