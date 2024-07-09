@@ -48,7 +48,7 @@ import { TestingSrv, TestingQuick } from './testing.ts';
 				method: 'GET',
 				url: '/sse',
 				schema: {},
-				handler: (req: Req, res: Res) => {
+				handler: (_req: Req, res: Res) => {
 					const target = res.sendEvents();
 					setTimeout(() => {
 						target.sendMessage({data: "Test" });
