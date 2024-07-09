@@ -1,5 +1,5 @@
 import { Ajv, type ValidateFunction, type Options } from 'ajv';
-import type { Route } from '../route.ts';
+import type { Middleware, Route } from '../route.ts';
 import type { Req } from '../req.ts';
 import type { Res } from '../res.ts';
 import type { Next } from '../route.ts';
@@ -17,7 +17,7 @@ type ValidationError = {
 
 
 export class SchemaValidator {
-	ajv = new Ajv({
+	ajv: Ajv = new Ajv({
 		allErrors: true,
 		useDefaults: true,
 		coerceTypes: true,
@@ -49,7 +49,7 @@ export class SchemaValidator {
     };
 	}
 
-	middleware = async (req: Req, _res: Res, next: Next) => {
+	middleware: Middleware = async (req: Req, _res: Res, next: Next) => {
 		if(req.route) {
 			this.compile(req.route);
 			await this.validate(req.route, req);

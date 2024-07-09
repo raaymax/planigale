@@ -1,6 +1,6 @@
 {
   "name": "@codecat/planigale",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "exports": "./mod.ts",
   "imports": {
     "@deno/cache-dir": "jsr:@deno/cache-dir@^0.8.0",
