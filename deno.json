@@ -10,6 +10,7 @@
     "@std/fs": "jsr:@std/fs@^0.218.2",
     "@std/http": "jsr:@std/http@^0.224.5",
     "@std/path": "jsr:@std/path@^0.218.2",
+    "@std/streams": "jsr:@std/streams@^0.224.5",
     "@ts-morph/bootstrap": "npm:@ts-morph/bootstrap@0.22",
     "ajv": "npm:ajv@^8.16.0",
     "code-block-writer": "npm:code-block-writer@^13.0.1",
