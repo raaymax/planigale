@@ -2,7 +2,7 @@
   "name": "@codecat/planigale",
   "version": "0.3.2",
   "exports": "./mod.ts",
-	"workspaces": [
+	"workspace": [
 		"packages/sse",
 	],
 
@@ -67,6 +67,7 @@
     "include": [
       "mod.ts",
       "src",
+			"packages/sse",
       "README.md",
       "LICENSE"
     ],
