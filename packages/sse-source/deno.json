@@ -1,5 +1,5 @@
 {
-  "name": "@codecat/sse-source",
+  "name": "@codecat/sse",
   "version": "0.0.1",
   "exports": "./mod.ts",
   "imports": {
