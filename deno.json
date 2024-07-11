@@ -1,6 +1,6 @@
 {
   "name": "@codecat/planigale",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "exports": "./mod.ts",
 	"workspaces": [
 		"packages/sse",
@@ -27,7 +27,8 @@
     "build": "deno run -A scripts/build_npm.ts",
     "publish": "deno publish && cd npm && npm publish",
     "test": "deno test -A && deno task build",
-		"check": "deno lint && deno fmt --check && deno test -A && deno publish --dry-run --allow-dirty"
+		"check": "deno lint && deno fmt --check && deno test -A && deno publish --dry-run --allow-dirty",
+		"ck": "deno task check && cd packages/sse && deno task check"
   },
   "test": {
     "exclude": [
