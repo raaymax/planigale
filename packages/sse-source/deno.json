@@ -1,0 +1,44 @@
+{
+  "name": "@codecat/sse-source",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "imports": {
+    "@std/streams": "jsr:@std/streams@^0.224.5",
+  },
+  "lint": {
+    "include": [
+      "src/"
+    ],
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [],
+      "exclude": [
+        "require-await"
+      ]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 120,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "include": [
+      "src/"
+    ]
+  },
+  "publish": {
+    "include": [
+      "mod.ts",
+      "src",
+      "README.md",
+      "LICENSE"
+    ],
+    "exclude": [
+      "src/**/*.test.ts"
+    ]
+  }
+}
