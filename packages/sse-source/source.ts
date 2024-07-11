@@ -1,8 +1,10 @@
 import { TextLineStream } from "@std/streams";
 
-const CONNECTING = 0;
-const OPEN = 1;
-const CLOSED = 2;
+const CONNECTING: number = 0;
+const OPEN: number = 1;
+const CLOSED: number = 2;
+
+type ConnectionState = typeof CONNECTING | typeof OPEN | typeof CLOSED;
 
 declare interface SSESourceInit extends RequestInit {
 	fetch?: (req: Request) => Promise<Response>;
@@ -19,54 +21,48 @@ export class SSESource extends EventTarget {
 	#abortController: AbortController = new AbortController();
 	#reconnectionTimerId: number | undefined;
 	#reconnectionTime = 5000;
-	#lastEventId = "";
-	#readyState = CONNECTING;
+	#lastEventId: string = "";
+	#readyState: ConnectionState = CONNECTING;
 	#input: Request | string;
 	#options: RequestInit | undefined;
 	#fetch: (req: Request) => Promise<Response>;
 
-	get readyState() {
+	get readyState(): ConnectionState {
 		return this.#readyState;
 	}
-	get CONNECTING() {
-		return CONNECTING;
+	get CONNECTING(): 0 {
+		return 0;
 	}
-	get OPEN() {
-		return OPEN;
+	get OPEN(): 1 {
+		return 1;
 	}
-	get CLOSED() {
-		return CLOSED;
+	get CLOSED(): 2 {
+		return 2;
 	}
-	get url() {
+	get url(): string {
 		return typeof this.#input === 'string' ? this.#input : this.#input.url;
 	}
-	#open = null
-	get onopen() {
-		return this.#open;
+	get onopen(): null {
+		return null;
 	}
 
-	set onopen(value) {
-		this.#open = value;
+	set onopen(value: never) {
 		throw new Error("Not implemented");
 	}
 
-	#message = null
-	get onmessage() {
-		return this.#message;
+	get onmessage(): null {
+		return null;
 	}
 
-	set onmessage(value) {
-		this.#message = value;
+	set onmessage(value: never) {
 		throw new Error("Not implemented");
 	}
 
-	#error = null
-	get onerror() {
-		return this.#error;
+	get onerror(): null {
+		return null
 	}
 
-	set onerror(value) {
-		this.#error = value;
+	set onerror(value: never) {
 		throw new Error("Not implemented");
 	}
 
@@ -252,7 +248,7 @@ export class SSESource extends EventTarget {
 	[Symbol.for("Deno.customInspect")]( 
 		inspect: typeof Deno.inspect,
 	options: Deno.InspectOptions,
-	) {
+	): string {
 		return `EventSourceMock ${inspect({
 			readyState: this.readyState,
 			url: this.url,
