@@ -104,7 +104,8 @@ export class SSESource extends EventTarget {
     const lastEventIdValue = this.#lastEventId;
     const headers = new Headers({
       'accept': 'text/event-stream',
-    });
+			...(typeof this.#input === 'string' ? {} : Object.fromEntries(this.#input.headers.entries()))
+   });
     if (lastEventIdValue !== '') {
       // ["Last-Event-Id", op_utf8_to_byte_string(lastEventIdValue)],
       headers.set('Last-Event-Id', lastEventIdValue);
