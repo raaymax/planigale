@@ -7,13 +7,15 @@
   },
   "lint": {
     "include": [
-      "src/"
+      "**/*.ts",
     ],
     "rules": {
       "tags": [
         "recommended"
       ],
-      "include": [],
+      "include": [
+				"no-slow-types"
+			],
       "exclude": [
         "require-await"
       ]

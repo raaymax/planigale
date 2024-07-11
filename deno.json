@@ -41,7 +41,10 @@
       "tags": [
         "recommended"
       ],
-      "include": [],
+      "include": [
+				"no-slow-types",
+				"missing-explicit-return-type"
+			],
       "exclude": [
         "require-await"
       ]
