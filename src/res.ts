@@ -3,7 +3,8 @@ import { Cookies } from './cookies.ts';
 
 type SSEMessage = ServerSentEventMessage;
 
-class SSEHandler {
+class SSETarget{
+	#keepAliveTimer: number | undefined;
 	stream: ReadableStream<SSEMessage>;
 	ctl: ReadableStreamDefaultController<SSEMessage> | null = null;
 
@@ -13,6 +14,8 @@ class SSEHandler {
 				this.ctl = controller
 			}
 		})
+
+		this.#loop();
 	}
 
 	sendMessage(message: ServerSentEventMessage): void {
@@ -20,7 +23,16 @@ class SSEHandler {
 	}
 
 	close(): void {
+		clearTimeout(this.#keepAliveTimer);
 		this.ctl?.close();
+	}
+	
+	// keep-alive by sending comments
+	#loop() {
+		this.#keepAliveTimer = setTimeout(() => {
+			this.sendMessage({comment: "keep-alive"});
+			this.#loop();
+		}, 3000);
 	}
 }
 
@@ -36,12 +48,12 @@ export class Res {
     return this;
   }
 
-	sendEvents(): SSEHandler {
+	sendEvents(): SSETarget{
 		this.headers.set("content-type", 'text/event-stream')
 		this.headers.set("cache-control", 'no-cache')
 		this.headers.set("connection", 'keep-alive')
 		this.headers.set("keep-alive", `timeout=${Number.MAX_SAFE_INTEGER}`)
-		const target = new SSEHandler();
+		const target = new SSETarget();
 		this.stream = target.stream;
 		return target;
 	}

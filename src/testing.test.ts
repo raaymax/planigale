@@ -1,13 +1,13 @@
 import { Planigale, Req, Res} from './mod.ts';
 import assert from 'node:assert';
 import { TestingSrv, TestingQuick } from './testing.ts';
-import { EventSource } from '@codecat/sse-source';
+import { SSESource } from '@codecat/sse-source';
 
 [
 	TestingSrv,
 	TestingQuick
 ].forEach((Testing) => {
-	Deno.test(`[${Testing.name}] EventSource`, async () => {
+	Deno.test(`[${Testing.name}] SSESource`, async () => {
 		const app = new Planigale();
 		const {getUrl, fetch, close, listen} = new Testing(app);
 		try {
@@ -25,7 +25,7 @@ import { EventSource } from '@codecat/sse-source';
 
 			// Test 
 			return await new Promise((resolve, reject) => {
-				const source = new EventSource(`${getUrl()}/sse`, {fetch});
+				const source = new SSESource(`${getUrl()}/sse`, {fetch});
 				source.addEventListener('error', (e) => {
 					//assertdeepEqual(source., 'error');
 					source.close();
@@ -65,7 +65,7 @@ import { EventSource } from '@codecat/sse-source';
 
 			// Test 
 			return await new Promise((resolve, reject) => {
-				const source = new EventSource(`${getUrl()}/sse`, {fetch});
+				const source = new SSESource(`${getUrl()}/sse`, {fetch});
 				let message = '';
 				source.addEventListener('message', (m) => {
 					//console.log('message', m);
@@ -83,7 +83,7 @@ import { EventSource } from '@codecat/sse-source';
 		}
 	});
 
-	Deno.test(`[${Testing.name}] EventSource happy path`, async () => {
+	Deno.test(`[${Testing.name}] SSESource happy path`, async () => {
 		const app = new Planigale();
 		const {getUrl, close, listen, fetch} = new Testing(app);
 		try {
@@ -102,7 +102,7 @@ import { EventSource } from '@codecat/sse-source';
 
 			// Test 
 			return await new Promise((resolve, reject) => {
-				const source = new EventSource(`${getUrl()}/sse`, {fetch});
+				const source = new SSESource(`${getUrl()}/sse`, {fetch});
 				source.addEventListener('message', (m) => {
 					console.log('message', m);
 				});
