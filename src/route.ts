@@ -10,7 +10,7 @@ export type Middleware = (req: Req, res: Res, next: Next) => void | Promise<void
 export type Handler = (req: Req, res: Res) => void | Promise<void>;
 
 export class BaseRoute {
-	id: string = Math.random().toString(36).slice(2);
+  id: string = Math.random().toString(36).slice(2);
   #middlewares: Middleware[] = [];
 
   use(middleware: Middleware): void {

@@ -1,4 +1,4 @@
-import { Ajv, type ValidateFunction, type Options } from 'ajv';
+import { Ajv, type Options, type ValidateFunction } from 'ajv';
 import type { Middleware, Route } from '../route.ts';
 import type { Req } from '../req.ts';
 import type { Res } from '../res.ts';
@@ -15,47 +15,48 @@ type ValidationError = {
   schemaPath: string;
 };
 
-
 export class SchemaValidator {
-	ajv: Ajv = new Ajv({
-		allErrors: true,
-		useDefaults: true,
-		coerceTypes: true,
-	});
-  validation: { [id: string]: {
-    body?: ValidateFunction;
-    params?: ValidateFunction;
-    query?: ValidateFunction;
-    headers?: ValidateFunction;
-  }} = {};
+  ajv: Ajv = new Ajv({
+    allErrors: true,
+    useDefaults: true,
+    coerceTypes: true,
+  });
+  validation: {
+    [id: string]: {
+      body?: ValidateFunction;
+      params?: ValidateFunction;
+      query?: ValidateFunction;
+      headers?: ValidateFunction;
+    };
+  } = {};
 
-  constructor(opts: Options = {}) { 
-		this.ajv = new Ajv({
-			allErrors: true,
-			useDefaults: true,
-			coerceTypes: true,
-			...opts,
-		});
+  constructor(opts: Options = {}) {
+    this.ajv = new Ajv({
+      allErrors: true,
+      useDefaults: true,
+      coerceTypes: true,
+      ...opts,
+    });
   }
 
-	compile(route: Route) {
-		if(this.validation[route.id]) return;
-		const def = route.definition;
-		this.validation[route.id] = {
+  compile(route: Route) {
+    if (this.validation[route.id]) return;
+    const def = route.definition;
+    this.validation[route.id] = {
       body: def.schema?.body ? this.ajv.compile(def.schema.body) : undefined,
       params: def.schema?.params ? this.ajv.compile(def.schema.params) : undefined,
       query: def.schema?.query ? this.ajv.compile(def.schema.query) : undefined,
       headers: def.schema?.headers ? this.ajv.compile(def.schema.headers) : undefined,
     };
-	}
+  }
 
-	middleware: Middleware = async (req: Req, _res: Res, next: Next) => {
-		if(req.route) {
-			this.compile(req.route);
-			await this.validate(req.route, req);
-		}
-		await next();
-	}
+  middleware: Middleware = async (req: Req, _res: Res, next: Next) => {
+    if (req.route) {
+      this.compile(req.route);
+      await this.validate(req.route, req);
+    }
+    await next();
+  };
 
   async validate(route: Route, req: Req) {
     const errors: ValidationError[][] = await Promise.all([

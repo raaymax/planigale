@@ -2,56 +2,55 @@ import type { Planigale } from './mod.ts';
 import type { HttpServer } from './types.ts';
 
 export interface Testing {
-	getUrl: () => string;
-	listen: () => Promise<void>;
-	fetch: (req: Request) => Promise<Response>;
-	close: () => void;
+  getUrl: () => string;
+  listen: () => Promise<void>;
+  fetch: (req: Request) => Promise<Response>;
+  close: () => void;
 }
 
-
 export class TestingSrv implements Testing {
-	static name = 'HTTP';
-	srv: HttpServer<Deno.NetAddr> | null = null;
-	baseUrl: string = 'http://127.0.0.1';
+  static name = 'HTTP';
+  srv: HttpServer<Deno.NetAddr> | null = null;
+  baseUrl: string = 'http://127.0.0.1';
 
-	constructor(private app: Planigale) {}
+  constructor(private app: Planigale) {}
 
-	getUrl = () => {
-		return this.baseUrl;
-	}
+  getUrl = () => {
+    return this.baseUrl;
+  };
 
-	listen = async () => {
-		const srv = await this.app.serve({ port: 0, onListen: () => {}});
-		const baseUrl = `http://${srv.addr.hostname}:${srv.addr.port}`;
-		this.baseUrl = baseUrl;
-		this.srv = srv;
-	}
+  listen = async () => {
+    const srv = await this.app.serve({ port: 0, onListen: () => {} });
+    const baseUrl = `http://${srv.addr.hostname}:${srv.addr.port}`;
+    this.baseUrl = baseUrl;
+    this.srv = srv;
+  };
 
-	fetch = async (req: Request) => {
-		return await fetch(req);
-	}
+  fetch = async (req: Request) => {
+    return await fetch(req);
+  };
 
-	close = () => {
-		if (this.srv) {
-			this.srv.shutdown();
-		}
-	}
+  close = () => {
+    if (this.srv) {
+      this.srv.shutdown();
+    }
+  };
 }
 
 export class TestingQuick implements Testing {
-	static name = 'Handler';
+  static name = 'Handler';
 
-	constructor(private app: Planigale) {}
+  constructor(private app: Planigale) {}
 
-	getUrl = () => {
-		return 'http://localhost';
-	}
+  getUrl = () => {
+    return 'http://localhost';
+  };
 
-	listen = async () => {}
+  listen = async () => {};
 
-	fetch = async (req: Request) => {
-		return await this.app.handle(req);
-	}
+  fetch = async (req: Request) => {
+    return await this.app.handle(req);
+  };
 
-	close = () => {}
+  close = () => {};
 }

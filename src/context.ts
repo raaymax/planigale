@@ -42,7 +42,7 @@ export class EndContext extends Context {
     const match = this.pattern.exec(req.url);
     req.params = match?.pathname.groups ?? {};
     req.path = match?.pathname.input ?? '';
-		req.route = this.route;
+    req.route = this.route;
 
     // TODO: store also context information in req for middleware use?
     req.context = this;

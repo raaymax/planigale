@@ -11,17 +11,17 @@ export type ReqInit = {
   query: Req['query'];
   headers: Req['headers'];
   body: Req['body'];
-	cookies: Req['cookies'];
+  cookies: Req['cookies'];
 };
 
 export class Req {
   ip: Deno.NetAddr | string = '';
-	route?: Route;
+  route?: Route;
   context?: any;
   method: string;
   url: string;
   path: string;
-	cookies: Cookies;
+  cookies: Cookies;
   params: Record<string, any>;
   query: Record<string, any>;
   headers: Record<string, string>;
@@ -41,7 +41,7 @@ export class Req {
       ip: info?.remoteAddr ?? '',
       path: url.pathname,
       params: {},
-			cookies: new Cookies(request.headers),
+      cookies: new Cookies(request.headers),
       query: qs.parse(url.search.slice(1)),
       headers: Object.fromEntries(request.headers.entries()),
       body: request.body ? await request.json() : {},
@@ -55,7 +55,7 @@ export class Req {
     query,
     headers,
     body,
-		cookies,
+    cookies,
   }: ReqInit) {
     this.ip = ip;
     this.method = request.method;
@@ -65,6 +65,6 @@ export class Req {
     this.query = query;
     this.headers = headers;
     this.body = body;
-		this.cookies = cookies;
+    this.cookies = cookies;
   }
 }

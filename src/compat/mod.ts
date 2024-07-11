@@ -22,5 +22,5 @@ export const serve = async (serveOpts: ServeOptions, handler: ServeHandler): Pro
   } else if (isNode()) {
     return (await import('./node.ts')).serve(serveOpts, handler);
   }
-	throw new Error('Unsupported runtime');
+  throw new Error('Unsupported runtime');
 };

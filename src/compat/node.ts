@@ -55,15 +55,15 @@ export const serve = (serveOpts: ServeOptions, handler: ServeHandler): HttpServe
         res.write(Buffer.from(await blob.arrayBuffer()));
         res.end();
       }).catch((e) => {
-				console.error(e);
-				opts.onError && opts.onError(e);
-			});
+        console.error(e);
+        opts.onError && opts.onError(e);
+      });
     });
-		srv.on('error', (e) => {
-			console.error(e);
-		})
+    srv.on('error', (e) => {
+      console.error(e);
+    });
     srv.on('clientError', (err, socket) => {
-			console.error(err);
+      console.error(err);
       socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
     });
 
