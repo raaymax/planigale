@@ -20,6 +20,9 @@ jobs:
 
       - name: Linting
         run: deno lint
+        
+      - name: Formatting
+        run: deno fmt --check
 
       - name: Testing
         run: deno test -A
