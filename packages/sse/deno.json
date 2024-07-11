@@ -6,17 +6,20 @@
     "@std/streams": "jsr:@std/streams@^0.224.5",
     "@std/http": "jsr:@std/http@^0.224.5"
   },
+  "tasks": {
+    "check": "deno lint && deno fmt --check && deno test -A && deno publish --dry-run --allow-dirty"
+  },
   "lint": {
     "include": [
-      "**/*.ts",
+      "**/*.ts"
     ],
     "rules": {
       "tags": [
         "recommended"
       ],
       "include": [
-				"no-slow-types"
-			],
+        "no-slow-types"
+      ],
       "exclude": [
         "require-await"
       ]
@@ -30,14 +33,14 @@
     "singleQuote": true,
     "proseWrap": "preserve",
     "include": [
-      "src/"
+      "."
     ]
   },
   "publish": {
     "include": [
       "mod.ts",
-			"sink.ts",
-			"source.ts",
+      "sink.ts",
+      "source.ts",
       "src",
       "README.md",
       "LICENSE"

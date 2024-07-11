@@ -1,7 +1,7 @@
 import { Planigale, Req, Res } from './mod.ts';
 import assert from 'node:assert';
 import { TestingQuick, TestingSrv } from './testing.ts';
-import { SSESource } from '@codecat/sse-source';
+import { SSESource } from '@codecat/sse';
 
 [
   TestingSrv,
