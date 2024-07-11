@@ -8,7 +8,7 @@ This library contains class that is used to create a server-sent event source. I
 ## Usage
 
 ```typescript
-import { SSESource } from 'jsr:@codecat/sse-source';
+import { SSESource } from 'jsr:@codecat/sse';
 
 const source = new SSESource('https://example.com/sse', {
   method: 'POST',
