@@ -11,7 +11,6 @@ Deno.test('SSESource and SSESink', async () => {
     });
     source.addEventListener('error', () => {
       assert.equal(counter, 2);
-      console.log('resolved');
       source.close();
       resolve();
     });
@@ -50,4 +49,3 @@ Deno.test('SSESource should sent headers', async () => {
 	assert.equal(req.headers.get('Content-Type'), 'application/json');
 	assert.equal(req.headers.get('Accept'), 'text/event-stream');
 })
-

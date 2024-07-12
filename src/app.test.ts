@@ -111,16 +111,29 @@ import { TestingQuick, TestingSrv } from './testing.ts';
 
   Deno.test(`[${Testing.name}] Routers`, async () => {
     const app = new Planigale();
+		let order = '';
     const { getUrl, fetch, close, listen } = new Testing(app);
     try {
       // Setup
       const router = new Router();
       app.use('/users', router);
       app.use(async (req: Req, _res: Res, next: Next) => {
+				order += 'a';
+        req.state.app = true;
+        await next();
+      });
+      app.use(async (req: Req, _res: Res, next: Next) => {
+				order += 'b';
         req.state.app = true;
         await next();
       });
       router.use(async (req: Req, _res: Res, next: Next) => {
+				order += 'c';
+        req.state.router = true;
+        await next();
+      });
+      router.use(async (req: Req, _res: Res, next: Next) => {
+				order += 'd';
         req.state.router = true;
         await next();
       });
@@ -129,6 +142,7 @@ import { TestingQuick, TestingSrv } from './testing.ts';
         url: '/:id',
         schema: {},
         handler: async (req: Req, res: Res) => {
+					order += 'e';
           assert.deepEqual(req.state.app, true);
           assert.deepEqual(req.state.router, true);
           res.send({ ok: true });
@@ -140,7 +154,9 @@ import { TestingQuick, TestingSrv } from './testing.ts';
       const req = new Request(`${getUrl()}/users/1`, {
         method: 'GET',
       });
+			order += '0';
       const res = await fetch(req);
+			assert.deepEqual(order, '0abcde');
       assert.deepEqual(res.status, 200);
       assert.deepEqual(await res.json(), { ok: true });
     } finally {

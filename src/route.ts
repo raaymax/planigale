@@ -14,7 +14,7 @@ export class BaseRoute {
   #middlewares: Middleware[] = [];
 
   use(middleware: Middleware): void {
-    this.#middlewares.push(middleware);
+    this.#middlewares.unshift(middleware);
   }
   /** @ignore */
   find(_req: Req, _ctx: Context): EndContext | undefined {

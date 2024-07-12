@@ -23,8 +23,8 @@ export class Context {
 
   getRoutes(): BaseRoute[] {
     return [
-      ...this.parent?.getRoutes() ?? [],
       this.route,
+      ...this.parent?.getRoutes() ?? [],
     ].filter(Boolean) as BaseRoute[];
   }
 
