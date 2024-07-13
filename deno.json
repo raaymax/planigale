@@ -5,7 +5,7 @@
   ],
   "tasks": {
     "version": "deno run -A scripts/version.ts",
-    "build": "deno run -A scripts/copy_files.ts",
+    "build": "deno run -A scripts/copy_files.ts && deno fmt",
     "publish": "deno task build && deno publish",
     "test": "deno test -A && deno task build",
     "check": "deno lint && deno fmt --check && deno test -A && deno publish --dry-run --allow-dirty",
