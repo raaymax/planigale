@@ -15,6 +15,11 @@ export class ApiError extends Error {
       message: this.message,
     };
   }
+
+  [Symbol.for('Deno.customInspect')](): string {
+    return `ApiError: [${this.errorCode}] ${this.status} ${this.message}\n` +
+      `${this.stack?.split('\n').slice(1).join('\n')}`;
+  }
 }
 
 export class ValidationFailed extends ApiError {
@@ -43,7 +48,7 @@ export class InternalServerError extends ApiError {
   serialize(): Record<string, unknown> {
     return {
       ...super.serialize(),
-      stack: this.originalError.stack,
+      stack: this.originalError.stack?.split('\n'),
     };
   }
 }

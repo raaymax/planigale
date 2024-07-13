@@ -9,6 +9,7 @@
     "publish": "deno task build && deno publish",
     "test": "deno test -A && deno task build",
     "check": "deno lint && deno fmt --check && deno test -A && deno publish --dry-run --allow-dirty",
+    "check-fmt": "deno lint && deno fmt && deno fmt --check && deno test -A --coverage=cov_profile && deno publish --dry-run --allow-dirty && deno coverage cov_profile",
     "ck": "deno task check && cd packages/sse && deno task check"
   },
 	"exclude": [

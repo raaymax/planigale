@@ -2,11 +2,14 @@ import type { Planigale } from './mod.ts';
 import type { HttpServer } from './types.ts';
 import { SSESource, type SSESourceInit } from '@codecat/sse';
 
+export type SSESourceFactory = (url: string | Request, opts?: SSESourceInit) => SSESource;
+
 export interface Testing {
   getUrl: () => string;
   listen: () => Promise<void>;
   fetch: (req: Request) => Promise<Response>;
-  close: () => void;
+  createEventSource: SSESourceFactory;
+  close: () => Promise<void>;
 }
 
 export class TestingSrv implements Testing {
@@ -31,13 +34,13 @@ export class TestingSrv implements Testing {
     return await fetch(req);
   };
 
-  createEventSource: (url: string, opts?: SSESourceInit) => SSESource = (url: string, opts?: SSESourceInit) => {
+  createEventSource: SSESourceFactory = (url, opts) => {
     return new SSESource(url, opts);
   };
 
-  close: () => void = () => {
+  close: Testing['close'] = async () => {
     if (this.srv) {
-      this.srv.shutdown();
+      await this.srv.shutdown();
     }
   };
 }
@@ -57,9 +60,9 @@ export class TestingQuick implements Testing {
     return await this.app.handle(req);
   };
 
-  createEventSource: (url: string, opts?: SSESourceInit) => SSESource = (url: string, opts?: SSESourceInit) => {
+  createEventSource: SSESourceFactory = (url, opts) => {
     return new SSESource(url, { ...opts, fetch: this.fetch });
   };
 
-  close: () => void = () => {};
+  close: Testing['close'] = async () => {};
 }

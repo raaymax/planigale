@@ -101,4 +101,34 @@ import { TestingQuick, TestingSrv } from './testing.ts';
       close();
     }
   });
+  Deno.test(`[${Testing.name}] SSESource should send custom headers`, async () => {
+    const app = new Planigale();
+    const { getUrl, close, listen, createEventSource } = new Testing(app);
+    try {
+      // Setup
+      app.route({
+        method: 'GET',
+        url: '/sse',
+        handler: (req: Req, res: Res) => {
+          console.log(req.headers);
+          assertEquals(req.headers['x-test'], 'valid');
+          const target = res.sendEvents();
+          setTimeout(() => target.close(), 3);
+        },
+      });
+      await listen();
+
+      // Test
+      const source = createEventSource(`${getUrl()}/sse`, {
+        headers: {
+          'X-test': 'valid',
+        },
+      });
+      const { done } = await source.next();
+      assertEquals(done, true);
+    } finally {
+      // Teardown
+      close();
+    }
+  });
 });

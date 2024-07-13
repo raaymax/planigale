@@ -113,7 +113,9 @@ export class SSESource {
   async #connect(): Promise<void> {
     const headers = new Headers({
       'accept': 'text/event-stream',
-      ...(typeof this.#input === 'string' ? {} : Object.fromEntries(this.#input.headers.entries())),
+      ...(typeof this.#input === 'string'
+        ? (this.#options?.headers ?? {})
+        : Object.fromEntries(this.#input.headers.entries())),
     });
 
     const req = new Request(this.#input, {

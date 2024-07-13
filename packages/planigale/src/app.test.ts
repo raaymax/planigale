@@ -1,11 +1,98 @@
 import { Next, Planigale, Req, Res, Router } from './mod.ts';
 import assert from 'node:assert';
 import { TestingQuick, TestingSrv } from './testing.ts';
+import { ApiError } from './errors.ts';
 
 [
   TestingSrv,
   TestingQuick,
 ].forEach((Testing) => {
+  Deno.test(`[${Testing.name}] 404 not found`, async () => {
+    const app = new Planigale();
+    const { getUrl, fetch, close, listen } = new Testing(app);
+    try {
+      // Setup
+      await listen();
+
+      // Test
+      const req = new Request(`${getUrl()}/any-url`);
+      const res = await fetch(req);
+      assert.deepEqual(res.status, 404);
+      assert.deepEqual(res.headers.get('content-type'), 'application/json');
+      assert.deepEqual(await res.json(), {
+        errorCode: 'RESOURCE_NOT_FOUND',
+        message: 'Resource not found',
+      });
+    } finally {
+      // Teardown
+      close();
+    }
+  });
+
+  Deno.test(`[${Testing.name}] 500 internal server error`, async () => {
+    const app = new Planigale();
+    const { getUrl, fetch, close, listen } = new Testing(app);
+    try {
+      // Setup
+      app.route({
+        method: 'GET',
+        url: '/error',
+        schema: {},
+        handler: async () => {
+          throw new Error('Test Error');
+        },
+      });
+      await listen();
+
+      // Test
+      const req = new Request(`${getUrl()}/error`);
+      const res = await fetch(req);
+      assert.deepEqual(res.status, 500);
+      assert.deepEqual(res.headers.get('content-type'), 'application/json');
+      const json = await res.json();
+      assert.deepEqual(json.errorCode, 'INTERNAL_SERVER_ERROR');
+      assert.deepEqual(json.message, 'Test Error');
+    } finally {
+      // Teardown
+      close();
+    }
+  });
+
+  Deno.test(`[${Testing.name}] Custom api error server error`, async () => {
+    const app = new Planigale();
+    const { getUrl, fetch, close, listen } = new Testing(app);
+    class AuthError extends ApiError {
+      constructor(message: string) {
+        super(401, 'AUTH_FAILED', message);
+        this.log = true;
+      }
+    }
+    try {
+      // Setup
+      app.route({
+        method: 'GET',
+        url: '/error',
+        schema: {},
+        handler: async () => {
+          throw new AuthError('failed auth');
+        },
+      });
+      await listen();
+
+      // Test
+      const req = new Request(`${getUrl()}/error`);
+      const res = await fetch(req);
+      assert.deepEqual(res.status, 401);
+      assert.deepEqual(res.headers.get('content-type'), 'application/json');
+      const json = await res.json();
+      assert.deepEqual(json.errorCode, 'AUTH_FAILED');
+      assert.deepEqual(json.message, 'failed auth');
+    } finally {
+      // Teardown
+      close();
+    }
+  });
+
   Deno.test(`[${Testing.name}] Basic functions`, async () => {
     const app = new Planigale();
     const { getUrl, fetch, close, listen } = new Testing(app);
@@ -239,4 +326,29 @@ import { TestingQuick, TestingSrv } from './testing.ts';
       close();
     }
   });
+});
+Deno.test(`Server starting without params`, async () => {
+  const app = new Planigale();
+  try {
+    // Setup
+    app.route({
+      method: 'GET',
+      url: '/ping',
+      schema: {},
+      handler: async (_req, res) => {
+        res.send({ ok: true });
+      },
+    });
+    const srv = await app.serve();
+    assert.equal(srv.addr.port, 8000);
+    const baseUrl = `http://${srv.addr.hostname}:${srv.addr.port}`;
+    const req = new Request(`${baseUrl}/ping`);
+    const res = await fetch(req);
+    assert.deepEqual(res.status, 200);
+    assert.deepEqual(res.headers.get('content-type'), 'application/json');
+    assert.deepEqual(await res.json(), { ok: true });
+  } finally {
+    // Teardown
+    close();
+  }
 });

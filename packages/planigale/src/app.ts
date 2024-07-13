@@ -100,10 +100,19 @@ export class Planigale extends Router {
   #handleErrors(e: Error) {
     if (e instanceof ApiError) {
       if (e.log) console.error(e);
-      return new Response(JSON.stringify(e.serialize()), { status: e.status });
+      return new Response(JSON.stringify(e.serialize()), {
+        status: e.status,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
     }
-    console.error(e);
     const ise = new InternalServerError(e);
-    return new Response(JSON.stringify(ise.serialize()), { status: ise.status });
+    return new Response(JSON.stringify(ise.serialize()), {
+      status: ise.status,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 }

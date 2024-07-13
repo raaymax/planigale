@@ -45,7 +45,7 @@ Deno.test('[SSE] Full events sending', async () => {
   assertEquals(done2, true);
 });
 
-Deno.test('[SSE] SSESource should sent headers', async () => {
+Deno.test('[SSE] SSESource should sent headers from request and from options', async () => {
   const requestInit = new Request('http://127.0.0.1/sse', {
     headers: {
       'Authorization': 'Bearer token',
@@ -54,11 +54,15 @@ Deno.test('[SSE] SSESource should sent headers', async () => {
     },
   });
   const source = new SSESource(requestInit, {
+    headers: {
+      'x-additional': 'additional',
+    },
     fetch: async (req: Request) => {
       assertEquals(req.headers.get('Authorization'), 'Bearer token');
       assertEquals(req.headers.get('X-Custom'), 'custom');
       assertEquals(req.headers.get('Content-Type'), 'application/json');
       assertEquals(req.headers.get('Accept'), 'text/event-stream');
+      assertEquals(req.headers.get('x-additional'), 'additional');
       return Response.error();
     },
   });
