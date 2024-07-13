@@ -1,4 +1,4 @@
-import { type SSEEvent, SSEStream} from './stream.ts';
+import { type SSEEvent, SSEStream } from './stream.ts';
 
 export class SSESink extends EventTarget {
   #keepAliveTimer: number | undefined;

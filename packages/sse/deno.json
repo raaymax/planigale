@@ -12,7 +12,7 @@
       "mod.ts",
       "sink.ts",
       "source.ts",
-			"stream.ts",
+      "stream.ts",
       "*.ts",
       "README.md",
       "LICENSE"
