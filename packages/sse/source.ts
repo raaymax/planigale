@@ -110,7 +110,7 @@ export class SSESource {
     await this.#connect();
   }
 
-  async #connect(): Promise<void>{
+  async #connect(): Promise<void> {
     const headers = new Headers({
       'accept': 'text/event-stream',
       ...(typeof this.#input === 'string' ? {} : Object.fromEntries(this.#input.headers.entries())),
@@ -137,7 +137,7 @@ export class SSESource {
     }
   }
 
-  async #connectBody(res: Response): Promise<void>{
+  async #connectBody(res: Response): Promise<void> {
     if (!res.body) {
       this.dispatch({ type: 'error', error: new Error('No response body') });
       return;
