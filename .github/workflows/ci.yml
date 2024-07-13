@@ -13,8 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: denoland/setup-deno@v1
-        with:
-          deno-version: canary
 
       - uses: actions/checkout@v4
 
