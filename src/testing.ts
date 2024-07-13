@@ -1,6 +1,6 @@
 import type { Planigale } from './mod.ts';
 import type { HttpServer } from './types.ts';
-import { SSESource } from '@codecat/sse';
+import { SSESource, type SSESourceInit } from '@codecat/sse';
 
 export interface Testing {
   getUrl: () => string;
@@ -31,8 +31,8 @@ export class TestingSrv implements Testing {
     return await fetch(req);
   };
 
-  createEventSource: (url: string) => SSESource = (url: string) => {
-    return new SSESource(url);
+  createEventSource: (url: string, opts?: SSESourceInit) => SSESource = (url: string, opts?: SSESourceInit) => {
+    return new SSESource(url, opts);
   };
 
   close: () => void = () => {
@@ -57,8 +57,8 @@ export class TestingQuick implements Testing {
     return await this.app.handle(req);
   };
 
-  createEventSource: (url: string) => SSESource = (url: string) => {
-    return new SSESource(url, { fetch: this.fetch });
+  createEventSource: (url: string, opts?: SSESourceInit) => SSESource = (url: string, opts?: SSESourceInit) => {
+    return new SSESource(url, { ...opts, fetch: this.fetch });
   };
 
   close: () => void = () => {};
