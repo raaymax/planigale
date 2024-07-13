@@ -2,16 +2,22 @@ import { ServerSentEventMessage, ServerSentEventStream } from '@std/http';
 
 export type SSEMessage = ServerSentEventMessage;
 
-export class SSESink {
+export class SSESink extends EventTarget {
   #keepAliveTimer: number | undefined;
   #keepAliveTime = 3000;
   stream: ReadableStream<SSEMessage>;
   ctl: ReadableStreamDefaultController<SSEMessage> | null = null;
 
   constructor() {
+    super();
     this.stream = new ReadableStream<SSEMessage>({
       start: (controller) => {
         this.ctl = controller;
+      },
+      cancel: () => {
+        this.dispatchEvent(new Event('close'));
+        clearTimeout(this.#keepAliveTimer);
+        this.ctl?.close();
       },
     });
 

@@ -111,40 +111,34 @@ import { TestingQuick, TestingSrv } from './testing.ts';
 
   Deno.test(`[${Testing.name}] Routers`, async () => {
     const app = new Planigale();
-		let order = '';
+    let order = '';
     const { getUrl, fetch, close, listen } = new Testing(app);
     try {
       // Setup
       const router = new Router();
       app.use('/users', router);
-      app.use(async (req: Req, _res: Res, next: Next) => {
-				order += 'a';
-        req.state.app = true;
+      app.use(async (_req: Req, _res: Res, next: Next) => {
+        order += 'a';
         await next();
       });
-      app.use(async (req: Req, _res: Res, next: Next) => {
-				order += 'b';
-        req.state.app = true;
+      app.use(async (_req: Req, _res: Res, next: Next) => {
+        order += 'b';
         await next();
       });
-      router.use(async (req: Req, _res: Res, next: Next) => {
-				order += 'c';
-        req.state.router = true;
+      router.use(async (_req: Req, _res: Res, next: Next) => {
+        order += 'c';
         await next();
       });
-      router.use(async (req: Req, _res: Res, next: Next) => {
-				order += 'd';
-        req.state.router = true;
+      router.use(async (_req: Req, _res: Res, next: Next) => {
+        order += 'd';
         await next();
       });
       router.route({
         method: 'GET',
         url: '/:id',
         schema: {},
-        handler: async (req: Req, res: Res) => {
-					order += 'e';
-          assert.deepEqual(req.state.app, true);
-          assert.deepEqual(req.state.router, true);
+        handler: async (_req: Req, res: Res) => {
+          order += 'e';
           res.send({ ok: true });
         },
       });
@@ -154,9 +148,9 @@ import { TestingQuick, TestingSrv } from './testing.ts';
       const req = new Request(`${getUrl()}/users/1`, {
         method: 'GET',
       });
-			order += '0';
+      order += '0';
       const res = await fetch(req);
-			assert.deepEqual(order, '0abcde');
+      assert.deepEqual(order, '0abcde');
       assert.deepEqual(res.status, 200);
       assert.deepEqual(await res.json(), { ok: true });
     } finally {

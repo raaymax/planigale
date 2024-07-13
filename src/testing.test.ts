@@ -1,7 +1,6 @@
 import { Planigale, Req, Res } from './mod.ts';
-import assert from 'node:assert';
+import { assert, assertEquals } from '@std/assert';
 import { TestingQuick, TestingSrv } from './testing.ts';
-import { SSESource } from '@codecat/sse';
 
 [
   TestingSrv,
@@ -9,7 +8,7 @@ import { SSESource } from '@codecat/sse';
 ].forEach((Testing) => {
   Deno.test(`[${Testing.name}] SSESource`, async () => {
     const app = new Planigale();
-    const { getUrl, fetch, close, listen } = new Testing(app);
+    const { getUrl, close, listen, createEventSource } = new Testing(app);
     try {
       // Setup
       app.route({
@@ -23,30 +22,25 @@ import { SSESource } from '@codecat/sse';
       });
       await listen();
 
-      // Test
-      return await new Promise((resolve, reject) => {
-        const source = new SSESource(`${getUrl()}/sse`, { fetch });
-        source.addEventListener('error', () => {
-          //assertdeepEqual(source., 'error');
-          source.close();
-          resolve();
-        });
-        source.addEventListener('message', () => {
-          reject(new Error('Should not receive message'));
-        });
-        source.addEventListener('open', () => {
-          reject(new Error('Should not open'));
-        });
-      });
+      const source = createEventSource(`${getUrl()}/sse`);
+      try {
+        await source.next();
+      } catch {
+        return;
+      } finally {
+        await source.close();
+      }
+      throw new Error('Should have thrown');
     } finally {
       // Teardown
+
       close();
     }
   });
 
   Deno.test(`[${Testing.name}] Server sent events stream`, async () => {
     const app = new Planigale();
-    const { getUrl, fetch, close, listen } = new Testing(app);
+    const { getUrl, close, listen, createEventSource } = new Testing(app);
     try {
       // Setup
       app.route({
@@ -64,21 +58,12 @@ import { SSESource } from '@codecat/sse';
       await listen();
 
       // Test
-      return await new Promise((resolve) => {
-        const source = new SSESource(`${getUrl()}/sse`, { fetch });
-        let message = '';
-        source.addEventListener('message', (m) => {
-          //console.log('message', m);
-          // deno-lint-ignore no-explicit-any
-          message = (m as any).data;
-        });
-        source.addEventListener('error', () => {
-          //console.log('error', e);
-          assert.deepEqual(message, 'Test');
-          source.close();
-          resolve();
-        });
-      });
+      const source = createEventSource(`${getUrl()}/sse`);
+      const { event } = await source.next();
+      assert(event);
+      assertEquals(event.data, 'Test');
+      const { done } = await source.next();
+      assertEquals(done, true);
     } finally {
       close();
     }
@@ -86,7 +71,7 @@ import { SSESource } from '@codecat/sse';
 
   Deno.test(`[${Testing.name}] SSESource happy path`, async () => {
     const app = new Planigale();
-    const { getUrl, close, listen, fetch } = new Testing(app);
+    const { getUrl, close, listen, createEventSource } = new Testing(app);
     try {
       // Setup
       app.route({
@@ -102,17 +87,15 @@ import { SSESource } from '@codecat/sse';
       await listen();
 
       // Test
-      return await new Promise((resolve) => {
-        const source = new SSESource(`${getUrl()}/sse`, { fetch });
-        source.addEventListener('message', (m) => {
-          console.log('message', m);
-        });
-        source.addEventListener('error', () => {
-          //console.log('error', e);
-          source.close();
-          resolve();
-        });
-      });
+      const source = createEventSource(`${getUrl()}/sse`);
+      const { event: ev1 } = await source.next();
+      assert(ev1);
+      assertEquals(ev1.event, 'hello');
+      const { event: ev2 } = await source.next();
+      assert(ev2);
+      assertEquals(ev2.event, 'hello2');
+      const { done } = await source.next();
+      assertEquals(done, true);
     } finally {
       // Teardown
       close();
