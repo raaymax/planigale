@@ -37,6 +37,8 @@ export type RouteDef = {
     headers?: JSONSchema;
     response?: JSONSchema;
   };
+  // deno-lint-ignore no-explicit-any
+  [key: string]: any;
   handler: Handler;
 };
 
