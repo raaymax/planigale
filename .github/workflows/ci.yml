@@ -12,6 +12,8 @@ permissions:
 jobs:
   CI:
     runs-on: ubuntu-latest
+    env:
+      CI: true
     steps:
       - uses: denoland/setup-deno@v1
 

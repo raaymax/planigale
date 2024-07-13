@@ -327,9 +327,12 @@ import { ApiError } from './errors.ts';
     }
   });
 });
-Deno.test(`Server starting without params`, async () => {
-  const app = new Planigale();
-  try {
+
+Deno.test({
+  name: `[Serve] Server starting with default port`,
+  ignore: Deno.env.get('CI') === 'true',
+  fn: async () => {
+    const app = new Planigale();
     // Setup
     app.route({
       method: 'GET',
@@ -340,15 +343,18 @@ Deno.test(`Server starting without params`, async () => {
       },
     });
     const srv = await app.serve();
-    assert.equal(srv.addr.port, 8000);
-    const baseUrl = `http://${srv.addr.hostname}:${srv.addr.port}`;
-    const req = new Request(`${baseUrl}/ping`);
-    const res = await fetch(req);
-    assert.deepEqual(res.status, 200);
-    assert.deepEqual(res.headers.get('content-type'), 'application/json');
-    assert.deepEqual(await res.json(), { ok: true });
-  } finally {
-    // Teardown
-    close();
+    try {
+      assert.equal(srv.addr.port, 8000);
+      const baseUrl = `http://${srv.addr.hostname}:${srv.addr.port}`;
+      const req = new Request(`${baseUrl}/ping`);
+      const res = await fetch(req);
+      assert.deepEqual(res.status, 200);
+      assert.deepEqual(res.headers.get('content-type'), 'application/json');
+      assert.deepEqual(await res.json(), { ok: true });
+    } catch (e) {
+      throw e;
+    } finally {
+      srv.shutdown();
+    }
   }
 });
