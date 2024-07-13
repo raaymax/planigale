@@ -103,11 +103,11 @@ export class Planigale extends Router {
   }
 
   /** Closes the server. */
-  close() {
+  async close() {
     if (this.#srv) {
-      this.#srv.shutdown();
+      await this.#srv.shutdown();
     } else {
-      this.#emit('close');
+      await this.#emit('close');
     }
   }
 
@@ -118,19 +118,22 @@ export class Planigale extends Router {
     this.#on('close', cb);
   }
 
-  #events = new Map<string, Array<() => void>>();
-  #on(event: string, cb: () => void) {
+  #events = new Map<string, Array<() => Promise<void> | void>>();
+  #on(event: string, cb: () => Promise<void> | void) {
     if (!this.#events.has(event)) {
       this.#events.set(event, []);
     }
     this.#events.get(event)?.push(cb);
   }
 
-  #emit(event: string) {
+  async #emit(event: string) {
     if (!this.#events.has(event)) {
       return;
     }
-    this.#events.get(event)?.forEach((cb) => cb());
+    return await Promise.all(
+      this.#events.get(event)
+        ?.map((cb) => Promise.resolve(cb())) ?? [],
+    );
   }
 
   #handleErrors(e: Error) {

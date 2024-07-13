@@ -38,9 +38,7 @@ export class TestingSrv implements Testing {
     return new SSESource(url, opts);
   };
 
-  close: Testing['close'] = async () => {
-    this.app.close();
-  };
+  close: Testing['close'] = async () => this.app.close();
 }
 
 export class TestingQuick implements Testing {
