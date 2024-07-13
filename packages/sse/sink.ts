@@ -1,16 +1,14 @@
-import { ServerSentEventMessage, ServerSentEventStream } from '@std/http';
-
-export type SSEMessage = ServerSentEventMessage;
+import { type SSEEvent, SSEStream} from './stream.ts';
 
 export class SSESink extends EventTarget {
   #keepAliveTimer: number | undefined;
   #keepAliveTime = 3000;
-  stream: ReadableStream<SSEMessage>;
-  ctl: ReadableStreamDefaultController<SSEMessage> | null = null;
+  stream: ReadableStream<SSEEvent>;
+  ctl: ReadableStreamDefaultController<SSEEvent> | null = null;
 
   constructor() {
     super();
-    this.stream = new ReadableStream<SSEMessage>({
+    this.stream = new ReadableStream<SSEEvent>({
       start: (controller) => {
         this.ctl = controller;
       },
@@ -24,7 +22,7 @@ export class SSESink extends EventTarget {
     this.#loop();
   }
 
-  sendMessage(message: SSEMessage): void {
+  sendMessage(message: SSEEvent): void {
     this.ctl?.enqueue(message);
   }
 
@@ -51,7 +49,7 @@ export class SSESink extends EventTarget {
   }
 
   getStream(): ReadableStream<Uint8Array> {
-    return this.stream.pipeThrough(new ServerSentEventStream());
+    return this.stream.pipeThrough(new SSEStream());
   }
 
   getResponse(): Response {
