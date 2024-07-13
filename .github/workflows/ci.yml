@@ -25,6 +25,9 @@ jobs:
       - name: Testing
         run: deno test -A
 
+      - name: Build
+        run: deno task build
+
       - name: Pre-publish checks
         run: deno publish --dry-run
 

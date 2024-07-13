@@ -3,6 +3,7 @@ name: JSR
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,5 +18,7 @@ jobs:
     steps:
       - uses: denoland/setup-deno@v1
       - uses: actions/checkout@v4
+      - name: Build
+        run: deno task build
       - name: Publish to JSR 
         run: deno publish
