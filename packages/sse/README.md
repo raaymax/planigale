@@ -1,11 +1,15 @@
 # SSESource
 
-This library contains class that is used to create a server-sent event source. It is similar in use to the `EventSource` class in JavaScript but the main difference it that it's constructor takse arguments just like `fetch` does. This allows you to pass headers, cookies, etc. to the server when creating the event source.
+The @codecat/sse library provides an easy and efficient way to handle Server-Sent Events (SSE) in JavaScript and TypeScript. It includes tools for both fetching and pushing events from/to the server.
 
-> [!WARNING]
-> Methods `onopen`, `onmessage`, `onerror` are not supported yet. Use `addEventListener` instead.
+- Fetching Events: The SSESource class allows you to connect to an SSE endpoint, handle events individually or in a loop, and gracefully manage connection closures.
+- Pushing Events: The SSESink class facilitates sending events from the server to connected clients, making it simple to implement real-time updates in your application.
+
+The library supports custom HTTP methods, headers, and request bodies, offering flexibility for various use cases.
 
 ## Usage
+
+### Fetching events from the server
 
 ```typescript
 import { SSESource } from 'jsr:@codecat/sse';
@@ -18,16 +22,38 @@ const source = new SSESource('https://example.com/sse', {
   body: JSON.stringify({ key: 'value' }),
 });
 
-source.addEventListener('open', (event) => {
-  console.log('Connection opened');
-});
+try {
+  // Handling events one by one
+  const { event, done } = await source.next();
+  console.log('connection closed: ', done);
+  if (!done) {
+    console.log(event.data);
+  }
 
-source.addEventListener('message', (event) => {
-  console.log(event.data);
-});
+  // Handling events in a loop
+  for await (const event of source) {
+    console.log(event.data);
+  }
+  console.log('connection closed');
+} catch (e) {
+  console.error(e);
+}
+```
 
-source.addEventListener('error', (event) => {
-  console.error(event);
+### Pushing events on the server
+
+```typescript
+import { SSESink } from 'jsr:@codecat/sse';
+
+Deno.serve((req) => {
+  if (req.method === 'GET' && req.url === '/sse') {
+    const sink = new SSESink();
+    setInterval(() => {
+      sink.sendMessage({ data: 'Hello, world!' });
+    }, 1000);
+    return sink.getResponse();
+  }
+  return Response.error();
 });
 ```
 

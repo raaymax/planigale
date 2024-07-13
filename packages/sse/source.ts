@@ -16,11 +16,11 @@ type ErrorEvent = {
   error: Error;
 };
 
-type SystemEvent = {
-  type: 'open' | 'close';
+type CloseEvent = {
+  type: 'close';
 };
 
-type InternalEvent = ErrorEvent | SystemEvent | (SSEEvent & { type: 'event' });
+type InternalEvent = ErrorEvent | CloseEvent | (SSEEvent & { type: 'event' });
 
 function parseMessage(message: SSEEvent, data: Record<string, string>): void {
   if (data.data) {
@@ -60,12 +60,12 @@ export class SSESource {
     this.#loop();
   }
 
-  async close() {
+  async close(): Promise<void> {
     this.#abortController.abort();
     this.dispatch({ type: 'close' });
   }
 
-  async *[Symbol.asyncIterator](): AsyncGenerator<SSEEvent | null> {
+  async *[Symbol.asyncIterator](): AsyncGenerator<SSEEvent> {
     while (true) {
       const { done, event } = await this.next();
       if (done) {
@@ -75,7 +75,7 @@ export class SSESource {
     }
   }
 
-  async next(): Promise<{ done: boolean; event: SSEEvent | null }> {
+  async next(): Promise<{ done: false; event: SSEEvent } | { done: true; event: null }> {
     if (this.#waiting.length) {
       throw new Error('Already waiting for next event');
     }
@@ -88,31 +88,29 @@ export class SSESource {
         return ({ done: false, event });
       } else if (event.type === 'error') {
         throw event.error;
-      } else if (event.type === 'close') {
-        return ({ done: true, event: null });
       } else {
-        return ({ done: false, event: null });
+        return ({ done: true, event: null });
       }
     });
   }
 
-  dispatch(event: InternalEvent) {
+  dispatch(event: InternalEvent): void {
     this.#queue.push(event);
     this.#handleEvent();
   }
 
-  #handleEvent() {
+  #handleEvent(): void {
     if (this.#waiting.length && this.#queue.length) {
       const resolve = this.#waiting.shift() as (ev: InternalEvent | null) => void;
       resolve(this.#queue.shift() ?? null);
     }
   }
 
-  async #loop() {
-    this.#connect();
+  async #loop(): Promise<void> {
+    await this.#connect();
   }
 
-  async #connect() {
+  async #connect(): Promise<void>{
     const headers = new Headers({
       'accept': 'text/event-stream',
       ...(typeof this.#input === 'string' ? {} : Object.fromEntries(this.#input.headers.entries())),
@@ -139,7 +137,7 @@ export class SSESource {
     }
   }
 
-  async #connectBody(res: Response) {
+  async #connectBody(res: Response): Promise<void>{
     if (!res.body) {
       this.dispatch({ type: 'error', error: new Error('No response body') });
       return;

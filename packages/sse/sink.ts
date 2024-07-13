@@ -34,7 +34,7 @@ export class SSESink extends EventTarget {
   }
 
   // keep-alive by sending comments
-  #loop() {
+  #loop(): void {
     this.#keepAliveTimer = setTimeout(() => {
       this.sendMessage({ comment: 'keep-alive' });
       this.#loop();
@@ -54,7 +54,7 @@ export class SSESink extends EventTarget {
     return this.stream.pipeThrough(new ServerSentEventStream());
   }
 
-  getReponse(): Response {
+  getResponse(): Response {
     if (!this.stream) {
       throw new Error('No stream');
     }
