@@ -330,7 +330,7 @@ import { ApiError } from './errors.ts';
 
 Deno.test({
   name: `[Serve] Server starting with default port`,
-  ignore: Deno.env.get('CI') === 'true',
+  ignore: Deno.env.get('CI') !== 'true',
   fn: async () => {
     const app = new Planigale();
     // Setup
@@ -356,5 +356,5 @@ Deno.test({
     } finally {
       srv.shutdown();
     }
-  }
+  },
 });
