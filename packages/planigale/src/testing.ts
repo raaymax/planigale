@@ -7,10 +7,12 @@ export type SSESourceFactory = (url: string | Request, opts?: SSESourceInit) => 
 export interface Testing {
   getUrl: () => string;
   listen: () => Promise<void>;
-  fetch: (req: Request) => Promise<Response>;
+  fetch: FetchFn;
   createEventSource: SSESourceFactory;
   close: () => Promise<void>;
 }
+
+export type FetchFn = (req: Request | string, opts?: RequestInit) => Promise<Response>;
 
 export class TestingSrv implements Testing {
   static name = 'HTTP';
@@ -30,8 +32,8 @@ export class TestingSrv implements Testing {
     this.srv = srv;
   };
 
-  fetch: (req: Request) => Promise<Response> = async (req: Request) => {
-    return await fetch(req);
+  fetch: FetchFn = async (req, opts) => {
+    return await fetch(req, opts);
   };
 
   createEventSource: SSESourceFactory = (url, opts) => {
@@ -52,8 +54,8 @@ export class TestingQuick implements Testing {
 
   listen: () => Promise<void> = async () => {};
 
-  fetch: (req: Request) => Promise<Response> = async (req: Request) => {
-    return await this.app.handle(req);
+  fetch: FetchFn = async (req, opts) => {
+    return await this.app.handle(new Request(req, opts));
   };
 
   createEventSource: SSESourceFactory = (url, opts) => {
