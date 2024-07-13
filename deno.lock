@@ -3,8 +3,9 @@
   "packages": {
     "specifiers": {
       "jsr:@deno/cache-dir@^0.8.0": "jsr:@deno/cache-dir@0.8.0",
-      "jsr:@std/assert": "jsr:@std/assert@0.218.2",
+      "jsr:@std/assert": "jsr:@std/assert@1.0.0",
       "jsr:@std/assert@^0.218.2": "jsr:@std/assert@0.218.2",
+      "jsr:@std/assert@^1.0.0": "jsr:@std/assert@1.0.0",
       "jsr:@std/async@^1.0.0-rc.1": "jsr:@std/async@1.0.0-rc.3",
       "jsr:@std/bytes@^0.218.2": "jsr:@std/bytes@0.218.2",
       "jsr:@std/bytes@^1.0.0-rc.3": "jsr:@std/bytes@1.0.1",
@@ -15,6 +16,7 @@
       "jsr:@std/fmt@^0.225.4": "jsr:@std/fmt@0.225.5",
       "jsr:@std/fs@^0.218.2": "jsr:@std/fs@0.218.2",
       "jsr:@std/http@^0.224.5": "jsr:@std/http@0.224.5",
+      "jsr:@std/internal@^1.0.1": "jsr:@std/internal@1.0.1",
       "jsr:@std/io@^0.218.2": "jsr:@std/io@0.218.2",
       "jsr:@std/io@^0.224.1": "jsr:@std/io@0.224.3",
       "jsr:@std/media-types@^1.0.0-rc.1": "jsr:@std/media-types@1.0.0-rc.1",
@@ -42,6 +44,12 @@
         "integrity": "7f0a5a1a8cf86607cd6c2c030584096e1ffad27fc9271429a8cb48cfbdee5eaf",
         "dependencies": [
           "jsr:@std/fmt@^0.218.2"
+        ]
+      },
+      "@std/assert@1.0.0": {
+        "integrity": "0e4f6d873f7f35e2a1e6194ceee39686c996b9e5d134948e644d35d4c4df2008",
+        "dependencies": [
+          "jsr:@std/internal@^1.0.1"
         ]
       },
       "@std/async@1.0.0-rc.3": {
@@ -84,6 +92,9 @@
           "jsr:@std/path@1.0.0-rc.2",
           "jsr:@std/streams@^0.224.5"
         ]
+      },
+      "@std/internal@1.0.1": {
+        "integrity": "6f8c7544d06a11dd256c8d6ba54b11ed870aac6c5aeafff499892662c57673e6"
       },
       "@std/io@0.218.2": {
         "integrity": "c64fbfa087b7c9d4d386c5672f291f607d88cb7d44fc299c20c713e345f2785f",
@@ -474,20 +485,23 @@
     "https://esm.sh/v135/side-channel@1.0.6/denonext/side-channel.mjs": "d8ff892d5cc335bc1aef123e69a51f5fb39961a6e34940eacd0f0b224c9bde59"
   },
   "workspace": {
-    "dependencies": [
-      "jsr:@deno/cache-dir@^0.8.0",
-      "jsr:@std/assert@^0.218.2",
-      "jsr:@std/fmt@^0.218.2",
-      "jsr:@std/fs@^0.218.2",
-      "jsr:@std/path@^0.218.2",
-      "jsr:@std/streams@^0.224.5",
-      "npm:@ts-morph/bootstrap@0.22",
-      "npm:@types/json-schema@^7.0.15",
-      "npm:ajv@^8.16.0",
-      "npm:code-block-writer@^13.0.1",
-      "npm:qs@^6.12.2"
-    ],
     "members": {
+      "packages/planigale": {
+        "dependencies": [
+          "jsr:@deno/cache-dir@^0.8.0",
+          "jsr:@std/assert@^1.0.0",
+          "jsr:@std/fmt@^0.218.2",
+          "jsr:@std/fs@^0.218.2",
+          "jsr:@std/http@^0.224.5",
+          "jsr:@std/path@^0.218.2",
+          "jsr:@std/streams@^0.224.5",
+          "npm:@ts-morph/bootstrap@0.22",
+          "npm:@types/json-schema@^7.0.15",
+          "npm:ajv@^8.16.0",
+          "npm:code-block-writer@^13.0.1",
+          "npm:qs@^6.12.2"
+        ]
+      },
       "packages/sse": {
         "dependencies": [
           "jsr:@std/assert@^0.224.5",

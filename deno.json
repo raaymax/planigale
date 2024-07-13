@@ -1,43 +1,20 @@
 {
-  "name": "@codecat/planigale",
-  "version": "0.4.0",
-  "exports": "./mod.ts",
   "workspace": [
-    "packages/sse"
+    "./packages/sse",
+		"./packages/planigale"
   ],
-  "imports": {
-    "@codecat/sse": "./packages/sse/mod.ts",
-    "@deno/cache-dir": "jsr:@deno/cache-dir@^0.8.0",
-    "@deno/dnt": "../../ThirdParty/dnt/mod.ts",
-    "@std/assert": "jsr:@std/assert@^0.218.2",
-    "@std/fmt": "jsr:@std/fmt@^0.218.2",
-    "@std/fs": "jsr:@std/fs@^0.218.2",
-    "@std/http": "jsr:@std/http@^0.224.5",
-    "@std/path": "jsr:@std/path@^0.218.2",
-    "@std/streams": "jsr:@std/streams@^0.224.5",
-    "@ts-morph/bootstrap": "npm:@ts-morph/bootstrap@0.22",
-    "ajv": "npm:ajv@^8.16.0",
-    "code-block-writer": "npm:code-block-writer@^13.0.1",
-    "json-schema": "npm:@types/json-schema@^7.0.15",
-    "qs": "npm:qs@^6.12.2"
-  },
   "tasks": {
     "version": "deno run -A scripts/version.ts",
-    "build": "deno run -A scripts/build_npm.ts",
-    "publish": "deno publish && cd npm && npm publish",
+    "build": "deno run -A scripts/copy_files.ts",
+    "publish": "deno task build && deno publish",
     "test": "deno test -A && deno task build",
     "check": "deno lint && deno fmt --check && deno test -A && deno publish --dry-run --allow-dirty",
     "ck": "deno task check && cd packages/sse && deno task check"
   },
-  "test": {
-    "exclude": [
-      "npm/"
-    ]
-  },
+	"exclude": [
+		"./npm"
+	],
   "lint": {
-    "include": [
-      "src/"
-    ],
     "rules": {
       "tags": [
         "recommended"
@@ -62,16 +39,4 @@
       "src/"
     ]
   },
-  "publish": {
-    "include": [
-      "mod.ts",
-      "src",
-      "packages/sse",
-      "README.md",
-      "LICENSE"
-    ],
-    "exclude": [
-      "src/**/*.test.ts"
-    ]
-  }
 }

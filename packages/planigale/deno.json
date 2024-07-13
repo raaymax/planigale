@@ -1,0 +1,35 @@
+{
+  "name": "@codecat/planigale",
+  "version": "0.4.0",
+  "exports": "./mod.ts",
+  "workspace": [
+    "./packages/sse"
+  ],
+  "imports": {
+    "@deno/cache-dir": "jsr:@deno/cache-dir@^0.8.0",
+    "@deno/dnt": "../../ThirdParty/dnt/mod.ts",
+    "@std/assert": "jsr:@std/assert@^1.0.0",
+    "@std/fmt": "jsr:@std/fmt@^0.218.2",
+    "@std/fs": "jsr:@std/fs@^0.218.2",
+    "@std/http": "jsr:@std/http@^0.224.5",
+    "@std/path": "jsr:@std/path@^0.218.2",
+    "@std/streams": "jsr:@std/streams@^0.224.5",
+    "@ts-morph/bootstrap": "npm:@ts-morph/bootstrap@0.22",
+    "ajv": "npm:ajv@^8.16.0",
+    "code-block-writer": "npm:code-block-writer@^13.0.1",
+    "json-schema": "npm:@types/json-schema@^7.0.15",
+    "qs": "npm:qs@^6.12.2"
+  },
+  "publish": {
+    "include": [
+      "deno.json",
+      "mod.ts",
+      "README.md",
+      "LICENSE",
+      "src"
+    ],
+    "exclude": [
+      "src/**/*.test.ts"
+    ]
+  }
+}

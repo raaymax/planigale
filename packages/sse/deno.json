@@ -7,42 +7,13 @@
     "@std/http": "jsr:@std/http@^0.224.5",
     "@std/assert": "jsr:@std/assert@^0.224.5"
   },
-  "tasks": {
-    "check": "deno lint && deno fmt --check && deno test --doc -A && deno publish --dry-run --allow-dirty"
-  },
-  "lint": {
-    "include": [
-      "**/*.ts"
-    ],
-    "rules": {
-      "tags": [
-        "recommended"
-      ],
-      "include": [
-        "no-slow-types"
-      ],
-      "exclude": [
-        "require-await"
-      ]
-    }
-  },
-  "fmt": {
-    "useTabs": false,
-    "lineWidth": 120,
-    "indentWidth": 2,
-    "semiColons": true,
-    "singleQuote": true,
-    "proseWrap": "preserve",
-    "include": [
-      "."
-    ]
-  },
   "publish": {
     "include": [
+      "deno.json",
       "mod.ts",
       "sink.ts",
       "source.ts",
-      "src",
+      "*.ts",
       "README.md",
       "LICENSE"
     ],
