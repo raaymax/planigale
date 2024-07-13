@@ -49,6 +49,8 @@ import * as Compat from './compat/mod.ts';
  * 	```
  */
 export class Planigale extends Router {
+  #srv: HttpServer<Deno.NetAddr> | null = null;
+
   /** This method is used to handle incoming requests. It will return a response object.
    * You can use this method to handle requests manually. Request and Response objects are the same as in fetch API.
    * This function is very useful for testing purposes as it provides all functionality of the server without the need to run it.
@@ -94,7 +96,41 @@ export class Planigale extends Router {
 
   async serve(opts?: ServeOptions): Promise<HttpServer<Deno.NetAddr>> {
     if (!opts) opts = {};
-    return Compat.serve(opts, this.handle);
+    const srv = await Compat.serve(opts, this.handle);
+    srv.finished.then(() => this.#emit('close'));
+    this.#srv = srv;
+    return srv;
+  }
+
+  /** Closes the server. */
+  close() {
+    if (this.#srv) {
+      this.#srv.shutdown();
+    } else {
+      this.#emit('close');
+    }
+  }
+
+  /** This method is used to listen for `close` event.
+   * Can be used to close also other connections like databases or similar
+   */
+  onClose(cb: () => void) {
+    this.#on('close', cb);
+  }
+
+  #events = new Map<string, Array<() => void>>();
+  #on(event: string, cb: () => void) {
+    if (!this.#events.has(event)) {
+      this.#events.set(event, []);
+    }
+    this.#events.get(event)?.push(cb);
+  }
+
+  #emit(event: string) {
+    if (!this.#events.has(event)) {
+      return;
+    }
+    this.#events.get(event)?.forEach((cb) => cb());
   }
 
   #handleErrors(e: Error) {

@@ -326,6 +326,20 @@ import { ApiError } from './errors.ts';
       close();
     }
   });
+  Deno.test(`[${Testing.name}] onClose gentle shutdown`, async () => {
+    const app = new Planigale();
+    const { close, listen } = new Testing(app);
+    // Setup
+    await listen();
+    // Test
+    const closed = await new Promise<boolean>((resolve) => {
+      app.onClose(() => {
+        resolve(true);
+      });
+      close();
+    });
+    assert(closed);
+  });
 });
 
 Deno.test({
