@@ -253,6 +253,7 @@ import { ApiError } from './errors.ts';
       // Setup
       const router = new Router();
       app.use('/users', router);
+      app.use(router);
       app.use(async (req: Req, _res: Res, next: Next) => {
         req.state.app = true;
         await next();
@@ -284,12 +285,42 @@ import { ApiError } from './errors.ts';
       await listen();
 
       // Test
-      const req = new Request(`${getUrl()}/ping`, {
-        method: 'GET',
-      });
-      const res = await fetch(req);
-      assert.deepEqual(res.status, 200);
-      assert.deepEqual(await res.json(), { ok: true });
+      {
+        const req = new Request(`${getUrl()}/ping`, {
+          method: 'GET',
+        });
+        const res = await fetch(req);
+        assert.deepEqual(res.status, 200);
+        assert.deepEqual(await res.json(), { ok: true });
+      }
+      {
+        const res = await fetch(
+          new Request(`${getUrl()}/someId`, {
+            method: 'GET',
+          }),
+        );
+        assert.deepEqual(res.status, 200);
+        assert.deepEqual(await res.json(), { ok: true });
+      }
+      {
+        const res = await fetch(
+          new Request(`${getUrl()}/users/someId`, {
+            method: 'GET',
+          }),
+        );
+        assert.deepEqual(res.status, 200);
+        assert.deepEqual(await res.json(), { ok: true });
+      }
+      {
+        const res = await fetch(
+          new Request(`${getUrl()}/unknown/path`, {
+            method: 'GET',
+          }),
+        );
+        assert.deepEqual(res.status, 404);
+        const json = await res.json();
+        assert.deepEqual(json.errorCode, 'RESOURCE_NOT_FOUND');
+      }
     } finally {
       // Teardown
       close();

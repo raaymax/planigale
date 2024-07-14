@@ -16,7 +16,6 @@ export class BaseRoute {
   use(middleware: Middleware): void {
     this.#middlewares.unshift(middleware);
   }
-  /** @ignore */
   find(_req: Req, _ctx: Context): EndContext | undefined {
     return undefined;
   }
@@ -87,6 +86,19 @@ export class Router extends BaseRoute {
    * ```
    */
   use(url: string, router: BaseRoute): void;
+  /** This method is used to add a new route or router to the server.
+   * @param router - The router or route to be added to the server.
+   * @example
+   * ```ts
+   * const app = new Planigale();
+   * const route = new Route({url: '/hello', method: 'GET', handler: (req, res) => res.send('Hello World!')});
+   * app.use(route);
+   * const request = new Request('http://localhost:8000/hello', {method: 'GET'});
+   * const response = await app.handle(request);
+   * console.log(response);
+   * ```
+   */
+  use(router: BaseRoute): void;
   /** This method is used to add a new middleware to the server.
    * @example
    * 	```ts
@@ -99,9 +111,11 @@ export class Router extends BaseRoute {
    * ```
    */
   use(middleware: Middleware): void;
-  use(arg: string | Middleware, arg2?: BaseRoute): void {
+  use(arg: string | Middleware | BaseRoute, arg2?: BaseRoute): void {
     if (typeof arg === 'function') {
       super.use(arg);
+    } else if (arg instanceof BaseRoute) {
+      this.#routes.push({ url: '', route: arg });
     } else {
       if (!arg2) throw new Error('Router must be provided');
       this.#routes.push({ url: arg, route: arg2 });
@@ -110,6 +124,7 @@ export class Router extends BaseRoute {
 
   /** This method is used to create a new route. It will return a Route object.
    * You can use this method to create a new route and add it to the server.
+   * Its just shorter version of creating a new `Route` object and adding it to the server using `use` function.
    * @example
    * ```ts
    * const app = new Planigale();
@@ -122,7 +137,7 @@ export class Router extends BaseRoute {
    */
   route(def: RouteDef): Route {
     const route = new Route(def);
-    this.#routes.push({ url: '', route });
+    this.use(route);
     return route;
   }
 
