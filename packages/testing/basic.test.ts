@@ -1,6 +1,6 @@
-import { Planigale, Req, Res } from './mod.ts';
+import { Planigale, Req, Res } from '@codecat/planigale';
 import { assert, assertEquals } from '@std/assert';
-import { TestingQuick, TestingSrv } from './testing.ts';
+import { TestingQuick, TestingSrv } from './basic.ts';
 
 [
   TestingSrv,
@@ -110,7 +110,6 @@ import { TestingQuick, TestingSrv } from './testing.ts';
         method: 'GET',
         url: '/sse',
         handler: (req: Req, res: Res) => {
-          console.log(req.headers);
           assertEquals(req.headers['x-test'], 'valid');
           const target = res.sendEvents();
           setTimeout(() => target.close(), 3);

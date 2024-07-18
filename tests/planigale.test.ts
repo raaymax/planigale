@@ -1,7 +1,6 @@
-import { Next, Planigale, Req, Res, Router } from './mod.ts';
+import { Next, Planigale, Req, Res, Router, ApiError } from '@codecat/planigale';
 import assert from 'node:assert';
-import { TestingQuick, TestingSrv } from './testing.ts';
-import { ApiError } from './errors.ts';
+import { TestingQuick, TestingSrv } from '@codecat/testing';
 
 [
   TestingSrv,

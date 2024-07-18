@@ -1,8 +1,14 @@
 {
   "workspace": [
     "./packages/sse",
-		"./packages/planigale"
+		"./packages/planigale",
+		"./packages/body-parser",
+    "./packages/schema",
+    "./packages/testing"
   ],
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.0"
+  },
   "tasks": {
     "version": "deno run -A scripts/version.ts",
     "build": "deno run -A scripts/copy_files.ts && deno fmt",

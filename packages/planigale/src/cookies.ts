@@ -7,7 +7,7 @@ export class Cookies {
   get(name: string): string | undefined {
     return getCookies(this.headers)?.[name];
   }
-  set(name: string, value: string, options: SetCookieOptions): void {
+  set(name: string, value: string, options: SetCookieOptions = {}): void {
     setCookie(this.headers, { name, value, ...options });
   }
   delete(name: string): void {

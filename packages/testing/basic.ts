@@ -1,5 +1,4 @@
-import type { Planigale } from './mod.ts';
-import type { HttpServer } from './types.ts';
+import type { Planigale } from '@codecat/planigale';
 import { SSESource, type SSESourceInit } from '@codecat/sse';
 
 export type SSESourceFactory = (url: string | Request, opts?: SSESourceInit) => SSESource;
@@ -16,7 +15,6 @@ export type FetchFn = (req: Request | string, opts?: RequestInit) => Promise<Res
 
 export class TestingSrv implements Testing {
   static name = 'HTTP';
-  srv: HttpServer<Deno.NetAddr> | null = null;
   baseUrl: string = 'http://127.0.0.1';
 
   constructor(private app: Planigale) {}
@@ -29,7 +27,6 @@ export class TestingSrv implements Testing {
     const srv = await this.app.serve({ port: 0, onListen: () => {} });
     const baseUrl = `http://${srv.addr.hostname}:${srv.addr.port}`;
     this.baseUrl = baseUrl;
-    this.srv = srv;
   };
 
   fetch: FetchFn = async (req, opts) => {

@@ -44,7 +44,7 @@ export class Req {
       cookies: new Cookies(request.headers),
       query: qs.parse(url.search.slice(1)),
       headers: Object.fromEntries(request.headers.entries()),
-      body: request.body ? await request.json() : {},
+      body: request.body,
     });
   }
 

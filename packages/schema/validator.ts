@@ -1,9 +1,5 @@
 import { Ajv, type Options, type ValidateFunction } from 'ajv';
-import type { Middleware, Route } from '../route.ts';
-import type { Req } from '../req.ts';
-import type { Res } from '../res.ts';
-import type { Next } from '../route.ts';
-import { ValidationFailed } from '../errors.ts';
+import { type Middleware, type Next, type Req, type Res, type Route, ValidationFailed } from '@codecat/planigale';
 
 type ValidationBlock = 'body' | 'params' | 'query' | 'headers';
 type ValidationError = {

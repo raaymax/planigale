@@ -20,7 +20,9 @@
       "npm:@types/json-schema@^7.0.15": "npm:@types/json-schema@7.0.15",
       "npm:@types/node": "npm:@types/node@18.16.19",
       "npm:ajv@^8.16.0": "npm:ajv@8.17.1",
-      "npm:qs@^6.12.2": "npm:qs@6.12.3"
+      "npm:ajv@^8.17.1": "npm:ajv@8.17.1",
+      "npm:qs@^6.12.2": "npm:qs@6.12.3",
+      "npm:qs@^6.12.3": "npm:qs@6.12.3"
     },
     "jsr": {
       "@std/assert@1.0.0": {
@@ -217,9 +219,22 @@
       }
     }
   },
-  "remote": {},
+  "remote": {
+    "https://deno.land/x/another_cookiejar@v5.0.4/cookie.ts": "2be7548d01a3a9df97deb187761a843a77fd824057478919abf1e1e89ae1eb2e",
+    "https://deno.land/x/another_cookiejar@v5.0.4/cookie_jar.ts": "e47d7b2c608bcd9600fd26825b600946f16ae167216cea71935049188d2fc6d1",
+    "https://deno.land/x/another_cookiejar@v5.0.4/fetch_wrapper.ts": "73434cb1b7d5e595eecdcc23e60af6fbc099b9e4cb82bb92d9f1617a85516286",
+    "https://deno.land/x/another_cookiejar@v5.0.4/mod.ts": "eff949014965771f2cd447fe78625a1ad28b59333afa40640f02c0922534d89a"
+  },
   "workspace": {
+    "dependencies": [
+      "jsr:@std/assert@^1.0.0"
+    ],
     "members": {
+      "packages/body-parser": {
+        "dependencies": [
+          "npm:qs@^6.12.3"
+        ]
+      },
       "packages/planigale": {
         "dependencies": [
           "jsr:@deno/cache-dir@^0.8.0",
@@ -236,9 +251,20 @@
           "npm:qs@^6.12.2"
         ]
       },
+      "packages/schema": {
+        "dependencies": [
+          "npm:ajv@^8.17.1"
+        ]
+      },
       "packages/sse": {
         "dependencies": [
           "jsr:@std/assert@^0.224.5",
+          "jsr:@std/streams@^0.224.5"
+        ]
+      },
+      "packages/testing": {
+        "dependencies": [
+          "jsr:@std/assert@^1.0.0",
           "jsr:@std/streams@^0.224.5"
         ]
       }
