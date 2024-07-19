@@ -1,8 +1,8 @@
-import { Planigale, Req, Res } from '@codecat/planigale';
-import assert from 'node:assert';
-import { Agent, TestingQuick, TestingSrv } from '@codecat/testing';
+import { Planigale, Req, Res } from '@planigale/planigale';
+import { assertEquals } from './deps_test.ts';
+import { Agent, TestingQuick, TestingSrv } from '@planigale/testing';
 import { SchemaValidator } from './validator.ts';
-import { bodyParser } from '@codecat/body-parser';
+import { bodyParser } from '@planigale/body-parser';
 
 [
   TestingSrv,
@@ -26,7 +26,7 @@ import { bodyParser } from '@codecat/body-parser';
         },
       },
       handler: async (req: Req, res: Res) => {
-        assert.deepEqual(req.body.data, 'oko');
+        assertEquals(req.body.data, 'oko');
         res.send({ ok: true });
       },
     });

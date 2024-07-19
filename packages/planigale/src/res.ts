@@ -1,4 +1,4 @@
-import { SSESink } from '@codecat/sse';
+import { SSESink } from '@planigale/sse';
 import { Cookies } from './cookies.ts';
 
 export class Res {

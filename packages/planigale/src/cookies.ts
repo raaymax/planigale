@@ -1,4 +1,4 @@
-import { Cookie, deleteCookie, getCookies, setCookie } from '@std/http';
+import { Cookie, deleteCookie, getCookies, setCookie } from './deps.ts';
 
 export type SetCookieOptions = Omit<Cookie, 'name' | 'value'>;
 

@@ -1,5 +1,5 @@
-import { Middleware } from '@codecat/planigale';
-import qs from 'qs';
+import { Middleware } from '@planigale/planigale';
+import { qs } from './deps.ts';
 
 export const bodyParser: Middleware = async (req, _res, next) => {
   const request = req.request;

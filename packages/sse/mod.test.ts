@@ -1,5 +1,5 @@
 import { SSESink, SSESource } from './mod.ts';
-import { assert, assertEquals } from 'jsr:@std/assert';
+import { assert, assertEquals } from './deps_test.ts';
 
 Deno.test('[SSE] Simple events streaming', async () => {
   const sink = new SSESink();

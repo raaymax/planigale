@@ -1,4 +1,4 @@
-import { Planigale, Req, Res } from '@codecat/planigale';
+import { Planigale, Req, Res } from '@planigale/planigale';
 import { Agent } from './agent.ts';
 
 const app = new Planigale();

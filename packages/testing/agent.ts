@@ -1,6 +1,5 @@
-import { Planigale } from '@codecat/planigale';
-import { assertEquals } from '@std/assert';
-import { CookieJar, wrapFetch } from 'https://deno.land/x/another_cookiejar@v5.0.4/mod.ts';
+import { Planigale } from '@planigale/planigale';
+import { CookieJar, wrapFetch, assertEquals } from './deps.ts';
 
 const Serialize = Symbol('Serialize');
 const Startserver = Symbol('Startserver');

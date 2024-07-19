@@ -2,7 +2,4 @@
   "name": "@planigale/body-parser",
   "version": "0.0.1",
   "exports": "./parser.ts",
-  "imports": {
-    "qs": "npm:qs@^6.12.3"
-  }
 }

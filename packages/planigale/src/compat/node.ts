@@ -1,6 +1,5 @@
 import { HttpServer, ServeHandler, ServeOptions } from '../types.ts';
-import http from 'node:http';
-import { Buffer } from 'node:buffer';
+import { http, Buffer } from './deps.ts';
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 export const serve = (serveOpts: ServeOptions, handler: ServeHandler): HttpServer<Deno.NetAddr> => {

@@ -1,5 +1,5 @@
-import { Ajv, type Options, type ValidateFunction } from 'ajv';
-import { type Middleware, type Next, type Req, type Res, type Route, ValidationFailed } from '@codecat/planigale';
+import { Ajv, type Options, type ValidateFunction } from './deps.ts';
+import { type Middleware, type Next, type Req, type Res, type Route, ValidationFailed } from '@planigale/planigale';
 
 type ValidationBlock = 'body' | 'params' | 'query' | 'headers';
 type ValidationError = {

@@ -1,4 +1,4 @@
-import type { JSONSchema7 as JSONSchema } from 'json-schema';
+import type { JSONSchema } from './deps.ts';
 import type { Req } from './req.ts';
 import type { Res } from './res.ts';
 import type { Context, EndContext } from './context.ts';

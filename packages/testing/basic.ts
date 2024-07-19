@@ -1,5 +1,5 @@
-import type { Planigale } from '@codecat/planigale';
-import { SSESource, type SSESourceInit } from '@codecat/sse';
+import type { Planigale } from '@planigale/planigale';
+import { SSESource, type SSESourceInit } from '@planigale/sse';
 
 export type SSESourceFactory = (url: string | Request, opts?: SSESourceInit) => SSESource;
 

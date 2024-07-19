@@ -1,4 +1,4 @@
-import { TextLineStream } from '@std/streams';
+import { TextLineStream } from './deps.ts';
 
 export declare interface SSESourceInit extends RequestInit {
   fetch?: (req: Request) => Promise<Response>;

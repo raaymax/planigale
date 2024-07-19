@@ -1,5 +1,5 @@
-import { Planigale, Req, Res } from '@codecat/planigale';
-import { assert, assertEquals } from '@std/assert';
+import { Planigale, Req, Res } from '@planigale/planigale';
+import { assert, assertEquals } from './deps.ts';
 import { TestingQuick, TestingSrv } from './basic.ts';
 
 [
