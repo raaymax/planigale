@@ -1,19 +1,14 @@
 // Source: https://github.com/jd1378/deno-another-cookiejar
 // Copyright (c) 2021 jd1378
-import {
-  Cookie,
-  CookieOptions,
-  isSameDomainOrSubdomain,
-  parseURL,
-} from "./cookie.ts";
+import { Cookie, CookieOptions, isSameDomainOrSubdomain, parseURL } from './cookie.ts';
 
 const strictMatchProps = [
-  "value",
-  "secure",
-  "httpOnly",
-  "maxAge",
-  "expires",
-  "sameSite",
+  'value',
+  'secure',
+  'httpOnly',
+  'maxAge',
+  'expires',
+  'sameSite',
 ];
 
 function cookieMatches(
@@ -111,7 +106,7 @@ export class CookieJar {
    */
   setCookie(cookie: Cookie | string, url?: string | Request | URL) {
     let cookieObj;
-    if (typeof cookie === "string") {
+    if (typeof cookie === 'string') {
       cookieObj = Cookie.from(cookie);
     } else {
       cookieObj = cookie;
@@ -151,7 +146,7 @@ export class CookieJar {
    * Also removes the cookie and returns undefined if cookie is expired.
    */
   getCookie(options: Cookie | CookieOptions): Cookie | undefined {
-    const strictMatch = typeof (options as Cookie).isValid !== "function";
+    const strictMatch = typeof (options as Cookie).isValid !== 'function';
     for (const [index, cookie] of this.cookies.entries()) {
       if (cookieMatches(options, cookie, strictMatch)) {
         if (!cookie.isExpired()) {
@@ -183,9 +178,7 @@ export class CookieJar {
         }
       }
       if (removeCookies.length) {
-        this.cookies = this.cookies.filter((cookie) =>
-          !removeCookies.includes(cookie)
-        );
+        this.cookies = this.cookies.filter((cookie) => !removeCookies.includes(cookie));
       }
       return matchedCookies;
     } else {
@@ -206,7 +199,7 @@ export class CookieJar {
         return cookie.canSendTo(parseURL(url));
       })
       .map((c) => c.getCookieString())
-      .join("; ");
+      .join('; ');
     return cookiesToSend;
   }
 
@@ -251,7 +244,7 @@ export class CookieJar {
 
   replaceCookies(cookies?: Array<Cookie> | Array<CookieOptions>) {
     if (cookies?.length) {
-      if (typeof (cookies[0] as Cookie).isValid === "function") {
+      if (typeof (cookies[0] as Cookie).isValid === 'function') {
         this.cookies = cookies as Array<Cookie>;
       } else {
         this.cookies = [];

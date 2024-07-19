@@ -1,7 +1,6 @@
 // Source: https://github.com/jd1378/deno-another-cookiejar
 // Copyright (c) 2021 jd1378
 
-
 // import {  } from "./deps.ts";
 
 // deno-lint-ignore no-control-regex
@@ -14,7 +13,7 @@ const COOKIE_NAME_BLOCKED = /[()<>@,;:\\"/[\]?={}]/;
 const COOKIE_OCTET_BLOCKED = /[\s",;\\]/;
 const COOKIE_OCTET = /^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]+$/;
 
-const TERMINATORS = ["\n", "\r", "\0"];
+const TERMINATORS = ['\n', '\r', '\0'];
 
 /**
  * does not make a difference which one is domainA or domainB
@@ -42,7 +41,7 @@ export function isSameDomainOrSubdomain(domainA?: string, domainB?: string) {
     return false;
   } else if (indexOfDomain > 0) {
     // if the character behind the part is not a dot, its not a subdomain
-    if (longerDomain.charAt(indexOfDomain - 1) !== ".") {
+    if (longerDomain.charAt(indexOfDomain - 1) !== '.') {
       return false;
     }
   }
@@ -53,7 +52,7 @@ export function isSameDomainOrSubdomain(domainA?: string, domainB?: string) {
 
 // from tough-cookie
 function trimTerminator(str: string) {
-  if (str === undefined || str === "") return str;
+  if (str === undefined || str === '') return str;
   for (let t = 0; t < TERMINATORS.length; t++) {
     const terminatorIdx = str.indexOf(TERMINATORS[t]);
     if (terminatorIdx !== -1) {
@@ -83,7 +82,7 @@ function trimWrappingDoubleQuotes(val: string) {
 }
 
 function isValidValue(val: string | undefined) {
-  if (val === "") {
+  if (val === '') {
     return true;
   }
   if (!val) {
@@ -110,10 +109,10 @@ export function parseURL(input: string | Request | URL) {
     copyUrl = input;
   }
   // we *need* to replace the leading dot to simplify usage and expectations
-  copyUrl = copyUrl.replace(/^\./, "");
-  if (!copyUrl.includes("://")) {
+  copyUrl = copyUrl.replace(/^\./, '');
+  if (!copyUrl.includes('://')) {
     // the protocol does not matter, but we default to insecure for use inside canSendTo
-    copyUrl = "http://" + copyUrl;
+    copyUrl = 'http://' + copyUrl;
   }
   return new URL(copyUrl);
 }
@@ -129,7 +128,7 @@ export type CookieOptions = {
   maxAge?: number;
   secure?: boolean;
   httpOnly?: boolean;
-  sameSite?: "Lax" | "Strict" | "None";
+  sameSite?: 'Lax' | 'Strict' | 'None';
   /** used for checking against maxAge */
   creationDate?: number;
 };
@@ -148,7 +147,7 @@ export class Cookie {
   // other
   secure: boolean | undefined;
   httpOnly: boolean | undefined;
-  sameSite: "Lax" | "Strict" | "None" | undefined;
+  sameSite: 'Lax' | 'Strict' | 'None' | undefined;
   creationDate = Date.now();
   // deno-lint-ignore ban-ts-comment
   // @ts-ignore
@@ -174,7 +173,7 @@ export class Cookie {
     }
 
     // used to break creation ties in cookieCompare():
-    Object.defineProperty(this, "creationIndex", {
+    Object.defineProperty(this, 'creationIndex', {
       configurable: false,
       enumerable: false, // important for assertStrictEquals checks
       writable: true,
@@ -197,13 +196,13 @@ export class Cookie {
     } as CookieOptions;
 
     const unparsed = cookieStr.slice().trim(); // copy
-    const attrAndValueList = unparsed.split(";");
+    const attrAndValueList = unparsed.split(';');
 
     // first split is the key value pair,
     // if theres no semicolon in the string, still the first element in array is key value pair
-    const keyValuePairString = trimTerminator(attrAndValueList.shift() || "")
+    const keyValuePairString = trimTerminator(attrAndValueList.shift() || '')
       .trim();
-    const keyValuePairEqualsIndex = keyValuePairString.indexOf("=");
+    const keyValuePairEqualsIndex = keyValuePairString.indexOf('=');
     if (keyValuePairEqualsIndex < 0) {
       return new Cookie();
     }
@@ -226,12 +225,12 @@ export class Cookie {
         continue;
       }
 
-      const avSeperatorIndex = cookieAV.indexOf("=");
+      const avSeperatorIndex = cookieAV.indexOf('=');
       let attrKey, attrValue;
 
       if (avSeperatorIndex === -1) {
         attrKey = cookieAV;
-        attrValue = "";
+        attrValue = '';
       } else {
         attrKey = cookieAV.substr(0, avSeperatorIndex);
         attrValue = cookieAV.substr(avSeperatorIndex + 1);
@@ -244,7 +243,7 @@ export class Cookie {
       }
 
       switch (attrKey) {
-        case "expires":
+        case 'expires':
           if (attrValue) {
             const expires = new Date(attrValue).getTime();
             if (expires && !isNaN(expires)) {
@@ -253,7 +252,7 @@ export class Cookie {
           }
           break;
 
-        case "max-age":
+        case 'max-age':
           if (attrValue) {
             const maxAge = parseInt(attrValue, 10);
             if (!isNaN(maxAge)) {
@@ -262,7 +261,7 @@ export class Cookie {
           }
           break;
 
-        case "domain":
+        case 'domain':
           if (attrValue) {
             const domain = parseURL(attrValue).hostname;
             if (domain) {
@@ -271,33 +270,31 @@ export class Cookie {
           }
           break;
 
-        case "path":
+        case 'path':
           if (attrValue) {
-            options.path = attrValue.startsWith("/")
-              ? attrValue
-              : "/" + attrValue;
+            options.path = attrValue.startsWith('/') ? attrValue : '/' + attrValue;
           }
           break;
 
-        case "secure":
+        case 'secure':
           options.secure = true;
           break;
 
-        case "httponly":
+        case 'httponly':
           options.httpOnly = true;
           break;
 
-        case "samesite": {
+        case 'samesite': {
           const lowerCasedSameSite = attrValue.toLowerCase();
           switch (lowerCasedSameSite) {
-            case "strict":
-              options.sameSite = "Strict";
+            case 'strict':
+              options.sameSite = 'Strict';
               break;
-            case "lax":
-              options.sameSite = "Lax";
+            case 'lax':
+              options.sameSite = 'Lax';
               break;
-            case "none":
-              options.sameSite = "None";
+            case 'none':
+              options.sameSite = 'None';
               break;
             default:
               break;
@@ -323,11 +320,11 @@ export class Cookie {
   canSendTo(url: string | Request | URL) {
     const urlObj = parseURL(url);
 
-    if (this.secure && urlObj.protocol !== "https:") {
+    if (this.secure && urlObj.protocol !== 'https:') {
       return false;
     }
 
-    if (this.sameSite === "None" && !this.secure) return false;
+    if (this.sameSite === 'None' && !this.secure) return false;
 
     if (this.path) {
       if (
@@ -337,14 +334,14 @@ export class Cookie {
       }
       if (
         urlObj.pathname.startsWith(this.path) &&
-        this.path[this.path.length - 1] === "/" // any sub path after a '/'
+        this.path[this.path.length - 1] === '/' // any sub path after a '/'
       ) {
         return true;
       }
       if (
         this.path.length < urlObj.pathname.length &&
         urlObj.pathname.startsWith(this.path) &&
-        urlObj.pathname[this.path.length] === "/"
+        urlObj.pathname[this.path.length] === '/'
       ) {
         return true;
         // this one was a bit tricky to understand for me
@@ -372,7 +369,7 @@ export class Cookie {
   }
 
   getCookieString() {
-    return `${this.name || ""}=${this.value || ""}`;
+    return `${this.name || ''}=${this.value || ''}`;
   }
 
   setDomain(url: string | Request | URL) {
@@ -383,12 +380,12 @@ export class Cookie {
     // https://www.rfc-editor.org/rfc/rfc6265#section-5.1.4
     const uriPath = parseURL(url).pathname; // step 1
 
-    if (!uriPath || uriPath[0] !== "/") { // step 2
-      this.path = "/";
+    if (!uriPath || uriPath[0] !== '/') { // step 2
+      this.path = '/';
     } else {
-      const rightmostSlashIdx = uriPath.lastIndexOf("/");
+      const rightmostSlashIdx = uriPath.lastIndexOf('/');
       if (rightmostSlashIdx <= 0) { // step 3
-        this.path = "/";
+        this.path = '/';
       } else { // step 4
         this.path = uriPath.slice(0, rightmostSlashIdx);
       }
@@ -398,7 +395,7 @@ export class Cookie {
   setExpires(exp: Date | number) {
     if (exp instanceof Date) {
       this.expires = exp.getTime();
-    } else if (typeof exp === "number" && exp >= 0) {
+    } else if (typeof exp === 'number' && exp >= 0) {
       this.expires = exp;
     }
   }
@@ -423,7 +420,7 @@ export class Cookie {
     let str = this.getCookieString();
 
     if (this.expires && this.expires !== Infinity) {
-      str += "; Expires=" + (new Date(this.expires)).toUTCString();
+      str += '; Expires=' + (new Date(this.expires)).toUTCString();
     }
 
     if (this.maxAge && this.maxAge !== Infinity) {
@@ -438,10 +435,10 @@ export class Cookie {
     }
 
     if (this.secure) {
-      str += "; Secure";
+      str += '; Secure';
     }
     if (this.httpOnly) {
-      str += "; HttpOnly";
+      str += '; HttpOnly';
     }
     if (this.sameSite) {
       str += `; SameSite=${this.sameSite}`;

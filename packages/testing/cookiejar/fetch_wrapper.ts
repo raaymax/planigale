@@ -1,6 +1,6 @@
 // Source: https://github.com/jd1378/deno-another-cookiejar
 // Copyright (c) 2021 jd1378
-import { CookieJar } from "./cookie_jar.ts";
+import { CookieJar } from './cookie_jar.ts';
 
 // Max 20 redirects is fetch default setting
 const MAX_REDIRECT = 20;
@@ -44,7 +44,7 @@ export function wrapFetch(options?: WrapFetchOptions): typeof fetch {
     }
     const cookieString = cookieJar.getCookieString(input);
 
-    let originalRedirectOption: ExtendedRequestInit["redirect"];
+    let originalRedirectOption: ExtendedRequestInit['redirect'];
     const originalRequestUrl: string = (input as Request).url ||
       input.toString();
 
@@ -57,7 +57,7 @@ export function wrapFetch(options?: WrapFetchOptions): typeof fetch {
 
     const interceptedInit: ExtendedRequestInit = {
       ...init,
-      redirect: "manual",
+      redirect: 'manual',
     };
 
     const reqHeaders = new Headers((input as Request).headers || {});
@@ -69,32 +69,32 @@ export function wrapFetch(options?: WrapFetchOptions): typeof fetch {
     }
 
     if (cookieString.length) {
-      reqHeaders.set("cookie", cookieString);
+      reqHeaders.set('cookie', cookieString);
     }
-    
-    reqHeaders.delete("cookie2"); // Remove cookie2 if it exists, It's deprecated
+
+    reqHeaders.delete('cookie2'); // Remove cookie2 if it exists, It's deprecated
 
     interceptedInit.headers = reqHeaders;
 
     const response = await fetch(input, interceptedInit as RequestInit);
 
     response.headers.forEach((value, key) => {
-      if (key.toLowerCase() === "set-cookie") {
+      if (key.toLowerCase() === 'set-cookie') {
         cookieJar.setCookie(value, response.url);
       }
     });
 
     const redirectCount = interceptedInit.redirectCount ?? 0;
-    const redirectUrl = response.headers.has("location")
+    const redirectUrl = response.headers.has('location')
       ? new URL(
-        response.headers.get("location")!.toString(),
+        response.headers.get('location')!.toString(),
         originalRequestUrl,
       ).toString()
       : undefined;
 
     // Do this check here to allow tail recursion of redirect.
     if (redirectCount > 0) {
-      Object.defineProperty(response, "redirected", { value: true });
+      Object.defineProperty(response, 'redirected', { value: true });
     }
 
     if (
@@ -103,12 +103,12 @@ export function wrapFetch(options?: WrapFetchOptions): typeof fetch {
       //  or location is not set
       !redirectUrl ||
       // or if it's the first request and request.redirect is set to 'manual'
-      (redirectCount === 0 && originalRedirectOption === "manual")
+      (redirectCount === 0 && originalRedirectOption === 'manual')
     ) {
       return response;
     }
 
-    if (originalRedirectOption === "error") {
+    if (originalRedirectOption === 'error') {
       await response.body?.cancel();
       throw new TypeError(
         `URI requested responded with a redirect and redirect mode is set to error: ${response.url}`,
@@ -131,14 +131,14 @@ export function wrapFetch(options?: WrapFetchOptions): typeof fetch {
 
     // Do not forward sensitive headers to third-party domains.
     if (!isDomainOrSubdomain(originalRequestUrl, redirectUrl)) {
-      for (const name of ["authorization", "www-authenticate"]) { // cookie headers are handled differently
+      for (const name of ['authorization', 'www-authenticate']) { // cookie headers are handled differently
         filteredHeaders.delete(name);
       }
     }
 
-    if (interceptedInit.method === "POST") {
-      filteredHeaders.delete("content-length");
-      interceptedInit.method = "GET";
+    if (interceptedInit.method === 'POST') {
+      filteredHeaders.delete('content-length');
+      interceptedInit.method = 'GET';
       interceptedInit.body = undefined;
     }
     interceptedInit.headers = filteredHeaders;
