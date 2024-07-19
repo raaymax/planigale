@@ -13,3 +13,4 @@ app.use(schemaValidator.middleware());
 MIT License
 
 Copyright (c) 2024 Mateusz Russak
+```

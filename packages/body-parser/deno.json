@@ -1,5 +1,5 @@
 {
   "name": "@planigale/body-parser",
   "version": "0.0.1",
-  "exports": "./parser.ts",
+  "exports": "./parser.ts"
 }

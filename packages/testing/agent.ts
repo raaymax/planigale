@@ -1,5 +1,5 @@
 import { Planigale } from '@planigale/planigale';
-import { CookieJar, wrapFetch, assertEquals } from './deps.ts';
+import { assertEquals, CookieJar, wrapFetch } from './deps.ts';
 
 const Serialize = Symbol('Serialize');
 const Startserver = Symbol('Startserver');
