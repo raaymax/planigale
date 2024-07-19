@@ -8,7 +8,7 @@ const Fetch = Symbol('Fetch');
 type FetchFn = (req: Request) => Promise<Response>;
 export class Agent {
   fetch: FetchFn;
-  cookieJar: CookieJar = new CookieJar();
+  #cookieJar: CookieJar = new CookieJar();
   #app: Planigale;
   #addr: {
     transport: 'tcp' | 'udp';
@@ -19,7 +19,7 @@ export class Agent {
   constructor(app: Planigale) {
     this.#app = app;
     this.fetch = wrapFetch({
-      cookieJar: this.cookieJar,
+      cookieJar: this.#cookieJar,
       fetch: async (req: string | URL | Request, init?: RequestInit) => {
         return await app.handle(new Request(req, init));
       },
@@ -32,7 +32,7 @@ export class Agent {
 
   async [Startserver](): Promise<void> {
     this.fetch = wrapFetch({
-      cookieJar: this.cookieJar,
+      cookieJar: this.#cookieJar,
       fetch,
     });
     const srv = await this.#app.serve({ port: 0, onListen: () => {} });

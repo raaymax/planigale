@@ -23,11 +23,11 @@ import { Planigale } from "https://deno.land/x/planigale/mod.ts";
 ```
 For JSR use the following import:
 ```typescript
-import { Planigale } from "jsr:@codecat/planigale";
+import { Planigale } from "jsr:@planigale/planigale";
 ```
 or add it to your import maps:
 ```bash
-deno add @codecat/planigale
+deno add @planigale/planigale
 ```
 
 ### NPM
@@ -48,7 +48,7 @@ import { Planigale } from "planigale";
 ### Basic example
 
 ```typescript
-import { Planigale } from "@codecat/planigale";
+import { Planigale } from "@planigale/planigale";
 
 const app = new Planigale();
 
@@ -188,7 +188,7 @@ TBA
 ### Unit testing
 Planigale is designed to be easily testable. You can test your handlers without running the server.
 ```typescript
-import { Planigale } from "@codecat/planigale";
+import { Planigale } from "@planigale/planigale";
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
 const app = new Planigale();

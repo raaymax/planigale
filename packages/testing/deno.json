@@ -9,7 +9,7 @@
       "sink.ts",
       "source.ts",
       "stream.ts",
-      "*.ts",
+      "**/*.ts",
       "README.md",
       "LICENSE"
     ],
