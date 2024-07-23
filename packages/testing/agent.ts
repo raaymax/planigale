@@ -1,11 +1,13 @@
-import { Planigale } from '@planigale/planigale';
+import type { Planigale } from '@planigale/planigale';
+import { SSESource, SSESourceInit } from '@planigale/sse';
 import { assertEquals, CookieJar, wrapFetch } from './deps.ts';
+import { formDataToBlob } from './formData.ts';
 
 const Serialize = Symbol('Serialize');
 const Startserver = Symbol('Startserver');
 const Fetch = Symbol('Fetch');
 
-type FetchFn = (req: Request) => Promise<Response>;
+type FetchFn = (req: Request | URL | string, opts?: RequestInit) => Promise<Response>;
 export class Agent {
   fetch: FetchFn;
   #cookieJar: CookieJar = new CookieJar();
@@ -24,6 +26,14 @@ export class Agent {
         return await app.handle(new Request(req, init));
       },
     });
+  }
+
+  static async from(app: Planigale, strategy?: 'http' | 'handler'): Promise<Agent> {
+    const agent = new Agent(app);
+    if (strategy === 'http') {
+      await agent[Startserver]();
+    }
+    return agent;
   }
 
   get [Fetch](): FetchFn {
@@ -50,14 +60,6 @@ export class Agent {
     return new RequestBuilder(agent);
   }
   /**
-   * Returns a new Agent instance with the provided Planigale app.
-   * @param app The Planigale app to use
-   * @returns A new Agent instance
-   */
-  static agent(app: Planigale): Agent {
-    return new Agent(app);
-  }
-  /**
    * Starts the server with the given app and executes the provided function with the agent.
    * @param app - The Planigale app instance.
    * @param fn - The function to be executed with the agent.
@@ -67,12 +69,20 @@ export class Agent {
     const agent = new Agent(app);
     await agent[Startserver]();
     await fn(agent);
-    await agent.#close();
+    await agent.close();
+  }
+
+  async useServer() {
+    await this[Startserver]();
   }
 
   request: () => RequestBuilder = () => new RequestBuilder(this);
 
-  async #close(): Promise<void> {
+  events: (url: string, opts: SSESourceInit) => SSESource = (url: string, opts: SSESourceInit = {}) => {
+    return new SSESource(new URL(url, this.addr), { ...opts, fetch: this.fetch });
+  };
+
+  async close(): Promise<void> {
     await this.#app.close();
   }
 
@@ -155,10 +165,9 @@ class RequestBuilder {
     });
   }
 }
-
 class BodyBuilder {
   #headers: Record<string, string> = {};
-  #body: BodyInit | null = null;
+  #body: BodyInit | null | Promise<BodyInit> = null;
 
   constructor(private parent: RequestBuilder) {}
 
@@ -172,41 +181,53 @@ class BodyBuilder {
     return new HeadersBuilder(this);
   }
 
-  formData(body: object): BodyBuilder {
-    this.#headers['Content-Type'] = 'multipart/form-data';
-    const formData = new FormData();
-    for (const key in body) {
-      formData.append(key, body[key as keyof typeof body]);
-    }
-    this.#body = formData;
-    return this;
+  emptyBody(): HeadersBuilder {
+    this.#body = null;
+    return new HeadersBuilder(this);
   }
 
-  urlencoded(body: object): BodyBuilder {
+  // deno-lint-ignore no-explicit-any
+  formData(body: Record<any, any>): HeadersBuilder {
+    const formData = new FormData();
+    for (const key in body) {
+      const val = body[key as keyof typeof body];
+      if (val instanceof Blob) {
+        formData.append(key, val, key);
+      } else if (val instanceof File) {
+        formData.append(key, val, val.name);
+      } else {
+        formData.append(key, val);
+      }
+    }
+    this.#body = formDataToBlob(formData);
+    return new HeadersBuilder(this);
+  }
+
+  urlencoded(body: object): HeadersBuilder {
     this.#headers['Content-Type'] = 'application/x-www-form-urlencoded';
     const urlencoded = new URLSearchParams();
     for (const key in body) {
       urlencoded.append(key, body[key as keyof typeof body]);
     }
     this.#body = urlencoded;
-    return this;
+    return new HeadersBuilder(this);
   }
 
-  text(body: string): BodyBuilder {
+  text(body: string): HeadersBuilder {
     this.#headers['Content-Type'] = 'text/plain;charset=UTF-8';
     this.#body = body;
-    return this;
+    return new HeadersBuilder(this);
   }
 
-  file(body: BodyInit): BodyBuilder {
+  file(body: BodyInit): HeadersBuilder {
     this.#body = body;
-    return this;
+    return new HeadersBuilder(this);
   }
 
-  [Serialize](): Request {
+  async [Serialize](): Promise<Request> {
     return new Request(this.parent[Serialize](), {
       headers: new Headers(this.#headers),
-      body: this.#body,
+      body: await this.#body,
     });
   }
 }
@@ -230,13 +251,13 @@ class HeadersBuilder {
   }
 
   // deno-lint-ignore no-explicit-any
-  expect(status: number, body: any): Tester {
+  expect(status: number, body?: any): Tester {
     const tester = new Tester(this);
     return tester.expect(status, body);
   }
 
-  [Serialize](): Request {
-    const req = this.parent[Serialize]();
+  async [Serialize](): Promise<Request> {
+    const req = await this.parent[Serialize]();
     return new Request(req, {
       headers: new Headers({
         ...Object.fromEntries(req.headers.entries()),
@@ -268,18 +289,25 @@ class Tester {
       const body = arg2;
 
       this.#expectations.push(async (res: Response) => {
-        assertEquals(res.status, status);
+        try {
+          assertEquals(res.status, status);
+        } catch (e) {
+          res.json().then(console.log).catch(console.error);
+          throw e;
+        }
       });
 
-      this.#expectations.push(async (res: Response) => {
-        assertEquals(await res.json(), body);
-      });
+      if (body) {
+        this.#expectations.push(async (res: Response) => {
+          assertEquals(await res.json(), body);
+        });
+      }
     }
     return this;
   }
 
   async then(resolve: (res: Response) => Promise<void>): Promise<void> {
-    const req = this.parent[Serialize]();
+    const req = await this.parent[Serialize]();
     const res = await this[Fetch](req);
     for (const expectation of this.#expectations) {
       await expectation(res);

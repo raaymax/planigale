@@ -1,4 +1,4 @@
-import { Planigale, Req, Res } from '@planigale/planigale';
+import { Planigale, Req } from '@planigale/planigale';
 import { assertEquals } from './deps_test.ts';
 import { Agent, TestingQuick, TestingSrv } from '@planigale/testing';
 import { SchemaValidator } from './validator.ts';
@@ -25,9 +25,9 @@ import { bodyParser } from '@planigale/body-parser';
           },
         },
       },
-      handler: async (req: Req, res: Res) => {
+      handler: async (req: Req) => {
         assertEquals(req.body.data, 'oko');
-        res.send({ ok: true });
+        return Response.json({ ok: true });
       },
     });
 
@@ -56,7 +56,7 @@ import { bodyParser } from '@planigale/body-parser';
           },
         },
       },
-      handler: async (_req: Req, _res: Res) => {
+      handler: async (_req: Req) => {
         throw new Error('Should not be called');
       },
     });
@@ -125,7 +125,7 @@ import { bodyParser } from '@planigale/body-parser';
           },
         },
       },
-      handler: async (_req: Req, _res: Res) => {
+      handler: async (_req: Req) => {
         throw new Error('Should not be called');
       },
     });

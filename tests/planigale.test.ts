@@ -1,4 +1,5 @@
 import { Next, Planigale, Req, Res, Router, ApiError } from '@planigale/planigale';
+import { SSESink } from '@planigale/sse';
 import { TestingQuick, TestingSrv } from '@planigale/testing';
 import { assert, assertEquals } from './deps_test.ts';
 
@@ -57,6 +58,38 @@ import { assert, assertEquals } from './deps_test.ts';
     }
   });
 
+  Deno.test(`[${Testing.name}] Setting cookies and headers using Res object`, async () => {
+    const app = new Planigale();
+    const { getUrl, fetch, close, listen } = new Testing(app);
+    try {
+      // Setup
+      app.route({
+        method: 'GET',
+        url: '/error',
+        schema: {},
+        handler: async () => {
+          const res = new Res();
+          res.cookies.set('test', 'value');
+          res.headers.set('x-test', 'value');
+          res.send({ok: true});
+          return res;
+        },
+      });
+      await listen();
+
+      // Test
+      const req = new Request(`${getUrl()}/error`);
+      const res = await fetch(req);
+      const json = await res.json();
+      assertEquals(json.ok, true);
+      assertEquals(res.headers.get('x-test'), 'value');
+      assertEquals(res.headers.get('set-cookie'), 'test=value');
+    } finally {
+      // Teardown
+      close();
+    }
+  });
+
   Deno.test(`[${Testing.name}] Custom api error server error`, async () => {
     const app = new Planigale();
     const { getUrl, fetch, close, listen } = new Testing(app);
@@ -101,14 +134,14 @@ import { assert, assertEquals } from './deps_test.ts';
         method: 'GET',
         url: '/users/:id',
         schema: {},
-        handler: (req: Req, res: Res) => {
+        handler: (req: Req) => {
           assertEquals(req.params.id, 'oko');
           assertEquals(req.query.sad, '123');
           assertEquals(req.query.zxc, '432');
           assertEquals(req.url, `${getUrl()}/users/oko?sad=123&zxc=432`);
           assertEquals(req.method, 'GET');
           assertEquals(req.path, '/users/oko');
-          res.send({ ok: true });
+          return Response.json({ ok: true });
         },
       });
       await listen();
@@ -134,12 +167,13 @@ import { assert, assertEquals } from './deps_test.ts';
         method: 'GET',
         url: '/sse',
         schema: {},
-        handler: (_req: Req, res: Res) => {
-          const target = res.sendEvents();
+        handler: (_req: Req) => {
+          const target = new SSESink();
           setTimeout(() => {
             target.sendMessage({ data: 'Test' });
             target.close();
           }, 1);
+          return target;
         },
       });
       await listen();
@@ -166,17 +200,18 @@ import { assert, assertEquals } from './deps_test.ts';
     const { getUrl, fetch, close, listen } = new Testing(app);
     try {
       // Setup
-      app.use(async (req: Req, res: Res, next: Next) => {
+      app.use(async (req: Req, next: Next) => {
         req.state.data = 'middleware';
-        await next();
+        const res = await req.makeResponse(await next());
         res.headers.set('x-middleware', 'true');
+        return res;
       });
       app.route({
         method: 'GET',
         url: '/users/:id',
         schema: {},
-        handler: async (req: Req, res: Res) => {
-          res.send({ ok: req.state.data });
+        handler: async (req: Req) => {
+          return Response.json({ ok: req.state.data });
         },
       });
       await listen();
@@ -203,29 +238,29 @@ import { assert, assertEquals } from './deps_test.ts';
       // Setup
       const router = new Router();
       app.use('/users', router);
-      app.use(async (_req: Req, _res: Res, next: Next) => {
+      app.use(async (_req: Req, next: Next) => {
         order += 'a';
-        await next();
+        return await next();
       });
-      app.use(async (_req: Req, _res: Res, next: Next) => {
+      app.use(async (_req: Req, next: Next) => {
         order += 'b';
-        await next();
+        return await next();
       });
-      router.use(async (_req: Req, _res: Res, next: Next) => {
+      router.use(async (_req: Req, next: Next) => {
         order += 'c';
-        await next();
+        return await next();
       });
-      router.use(async (_req: Req, _res: Res, next: Next) => {
+      router.use(async (_req: Req, next: Next) => {
         order += 'd';
-        await next();
+        return await next();
       });
       router.route({
         method: 'GET',
         url: '/:id',
         schema: {},
-        handler: async (_req: Req, res: Res) => {
+        handler: async (_req: Req) => {
           order += 'e';
-          res.send({ ok: true });
+          return Response.json({ ok: true });
         },
       });
       await listen();
@@ -253,32 +288,32 @@ import { assert, assertEquals } from './deps_test.ts';
       const router = new Router();
       app.use('/users', router);
       app.use(router);
-      app.use(async (req: Req, _res: Res, next: Next) => {
+      app.use(async (req: Req, next: Next) => {
         req.state.app = true;
-        await next();
+        return await next();
       });
-      router.use(async (req: Req, _res: Res, next: Next) => {
+      router.use(async (req: Req, next: Next) => {
         req.state.router = true;
-        await next();
+        return await next();
       });
       router.route({
         method: 'GET',
         url: '/:id',
         schema: {},
-        handler: async (req: Req, res: Res) => {
+        handler: async (req: Req) => {
           assertEquals(req.state.app, true);
           assertEquals(req.state.router, true);
-          res.send({ ok: true });
+          return Response.json({ ok: true });
         },
       });
       app.route({
         method: 'GET',
         url: '/ping',
         schema: {},
-        handler: async (req: Req, res: Res) => {
+        handler: async (req: Req) => {
           assertEquals(req.state.app, true);
           assertEquals(!req.state.router, true);
-          res.send({ ok: true });
+          return Response.json({ ok: true });
         },
       });
       await listen();
@@ -337,9 +372,9 @@ import { assert, assertEquals } from './deps_test.ts';
         method: 'GET',
         url: '/details',
         schema: {},
-        handler: async (req: Req, res: Res) => {
+        handler: async (req: Req) => {
           assertEquals(req.params.userId, 'test');
-          res.send({ ok: true });
+          return Response.json({ ok: true });
         },
       });
       await listen();
@@ -382,8 +417,8 @@ Deno.test({
       method: 'GET',
       url: '/ping',
       schema: {},
-      handler: async (_req, res) => {
-        res.send({ ok: true });
+      handler: async () => {
+        return Response.json({ ok: true });
       },
     });
     const srv = await app.serve();

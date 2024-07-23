@@ -1,5 +1,5 @@
 import { Ajv, type Options, type ValidateFunction } from './deps.ts';
-import { type Middleware, type Next, type Req, type Res, type Route, ValidationFailed } from '@planigale/planigale';
+import { type Middleware, type Next, type Req, type Route, ValidationFailed } from '@planigale/planigale';
 
 type ValidationBlock = 'body' | 'params' | 'query' | 'headers';
 type ValidationError = {
@@ -46,12 +46,12 @@ export class SchemaValidator {
     };
   }
 
-  middleware: Middleware = async (req: Req, _res: Res, next: Next) => {
+  middleware: Middleware = async (req: Req, next: Next) => {
     if (req.route) {
       this.compile(req.route);
       await this.validate(req.route, req);
     }
-    await next();
+    return await next();
   };
 
   async validate(route: Route, req: Req) {

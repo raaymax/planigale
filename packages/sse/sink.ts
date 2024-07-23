@@ -52,7 +52,7 @@ export class SSESink extends EventTarget {
     return this.stream.pipeThrough(new SSEStream());
   }
 
-  getResponse(): Response {
+  toResponse(): Response {
     if (!this.stream) {
       throw new Error('No stream');
     }

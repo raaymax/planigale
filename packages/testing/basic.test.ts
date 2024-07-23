@@ -1,4 +1,5 @@
-import { Planigale, Req, Res } from '@planigale/planigale';
+import { Planigale, Req } from '@planigale/planigale';
+import { SSESink } from '@planigale/sse';
 import { assert, assertEquals } from './deps.ts';
 import { TestingQuick, TestingSrv } from './basic.ts';
 
@@ -15,9 +16,8 @@ import { TestingQuick, TestingSrv } from './basic.ts';
         method: 'GET',
         url: '/sse',
         schema: {},
-        handler: (_req: Req, res: Res) => {
-          res.status = 400;
-          res.send({ ok: false });
+        handler: () => {
+          return Response.json({ ok: false }, { status: 400 });
         },
       });
       await listen();
@@ -47,12 +47,13 @@ import { TestingQuick, TestingSrv } from './basic.ts';
         method: 'GET',
         url: '/sse',
         schema: {},
-        handler: (_req: Req, res: Res) => {
-          const target = res.sendEvents();
+        handler: () => {
+          const target = new SSESink();
           setTimeout(() => {
             target.sendMessage({ data: 'Test' });
             target.close();
           }, 1);
+          return target;
         },
       });
       await listen();
@@ -77,11 +78,12 @@ import { TestingQuick, TestingSrv } from './basic.ts';
       app.route({
         method: 'GET',
         url: '/sse',
-        handler: (_req: Req, res: Res) => {
-          const target = res.sendEvents();
+        handler: () => {
+          const target = new SSESink();
           setTimeout(() => target.sendMessage({ event: 'hello' }), 1);
           setTimeout(() => target.sendMessage({ event: 'hello2' }), 2);
           setTimeout(() => target.close(), 3);
+          return target;
         },
       });
       await listen();
@@ -109,10 +111,11 @@ import { TestingQuick, TestingSrv } from './basic.ts';
       app.route({
         method: 'GET',
         url: '/sse',
-        handler: (req: Req, res: Res) => {
+        handler: (req: Req) => {
           assertEquals(req.headers['x-test'], 'valid');
-          const target = res.sendEvents();
+          const target = new SSESink();
           setTimeout(() => target.close(), 3);
+          return target;
         },
       });
       await listen();

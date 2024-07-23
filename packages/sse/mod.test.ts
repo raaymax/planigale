@@ -3,7 +3,7 @@ import { assert, assertEquals } from './deps_test.ts';
 
 Deno.test('[SSE] Simple events streaming', async () => {
   const sink = new SSESink();
-  const source = new SSESource('http://127.0.0.1/sse', { fetch: async () => sink.getResponse() });
+  const source = new SSESource('http://127.0.0.1/sse', { fetch: async () => sink.toResponse() });
 
   setTimeout(() => {
     sink.sendMessage({ data: 'Test' });
@@ -20,7 +20,7 @@ Deno.test('[SSE] Simple events streaming', async () => {
 
 Deno.test('[SSE] Full events sending', async () => {
   const sink = new SSESink();
-  const source = new SSESource('http://127.0.0.1/sse', { fetch: async () => sink.getResponse() });
+  const source = new SSESource('http://127.0.0.1/sse', { fetch: async () => sink.toResponse() });
 
   setTimeout(() => {
     sink.sendMessage({ data: 'Test', event: 'hello', id: '1', retry: 2, comment: 'comment' });
@@ -77,7 +77,21 @@ Deno.test('[SSE] SSESource should sent headers from request and from options', a
 Deno.test('[SSE] Making it easier to test', async () => {
   const sink = new SSESink();
   const requestInit = new Request('http://127.0.0.1/sse');
-  const source = new SSESource(requestInit, { fetch: async () => sink.getResponse() });
+  const source = new SSESource(requestInit, { fetch: async () => sink.toResponse() });
+  sink.sendMessage({ data: 'Test' });
+  const { event, done } = await source.next();
+  assert(event);
+  assertEquals(done, false);
+  assertEquals(event.data, 'Test');
+  sink.close();
+  const { event: ev2, done: d2 } = await source.next();
+  assert(!ev2);
+  assertEquals(d2, true);
+});
+
+Deno.test('[SSE] SSESource accepts URL ', async () => {
+  const sink = new SSESink();
+  const source = new SSESource(new URL('/sse', 'http://127.0.0.1/'), { fetch: async () => sink.toResponse() });
   sink.sendMessage({ data: 'Test' });
   const { event, done } = await source.next();
   assert(event);
@@ -92,7 +106,7 @@ Deno.test('[SSE] Making it easier to test', async () => {
 Deno.test('[SSE] Gracefull closing by sink', async () => {
   const sink = new SSESink();
   const requestInit = new Request('http://127.0.0.1/sse');
-  const source = new SSESource(requestInit, { fetch: async () => sink.getResponse() });
+  const source = new SSESource(requestInit, { fetch: async () => sink.toResponse() });
   sink.close();
   const { done } = await source.next();
   assertEquals(done, true);
@@ -100,7 +114,7 @@ Deno.test('[SSE] Gracefull closing by sink', async () => {
 
 Deno.test('[SSE] Gracefull closing by source', async () => {
   const sink = new SSESink();
-  const srv = Deno.serve({ port: 0, onListen: () => {} }, () => sink.getResponse());
+  const srv = Deno.serve({ port: 0, onListen: () => {} }, () => sink.toResponse());
   const requestInit = new Request(`http://127.0.0.1:${srv.addr.port}/sse`);
   const source = new SSESource(requestInit);
   const closed = new Promise<void>((resolve) => sink.addEventListener('close', () => resolve()));

@@ -3,7 +3,6 @@ import { Router } from './route.ts';
 import type { Next } from './route.ts';
 import { Context } from './context.ts';
 import { Req } from './req.ts';
-import { Res } from './res.ts';
 import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
 import * as Compat from './compat/mod.ts';
 
@@ -68,17 +67,20 @@ export class Planigale extends Router {
   ): Promise<Response> => {
     try {
       const req = await Req.fromRequest(request, info);
-      const res = new Res();
       const ctx = this.find(req, new Context());
       if (!ctx) {
         throw new ResourceNotFound('Resource not found');
       }
       ctx.preProcess(req);
 
-      await ctx.getRoutes().map((r) => r.getMiddlewares()).flat().reduce<Next>((acc, middleware) => {
-        return async () => await middleware(req, res, acc);
-      }, async () => await ctx.route.handler(req, res))();
-      return res.serialize();
+      const res = await ctx.getRoutes()
+        .map((r) => r.getMiddlewares())
+        .flat()
+        .reduce<Next>((acc, middleware) => {
+          return async () => await middleware(req, acc);
+        }, async () => await ctx.route.handler(req))();
+
+      return await req.makeResponse(res);
     } catch (e) {
       return this.#handleErrors(e);
     }

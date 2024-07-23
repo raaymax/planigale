@@ -1,13 +1,20 @@
-import type { JSONSchema } from './deps.ts';
 import type { Req } from './req.ts';
-import type { Res } from './res.ts';
 import type { Context, EndContext } from './context.ts';
 
 export * from './errors.ts';
 
-export type Next = () => void | Promise<void>;
-export type Middleware = (req: Req, res: Res, next: Next) => void | Promise<void>;
-export type Handler = (req: Req, res: Res) => void | Promise<void>;
+export type ResponseFn = () => Promise<Response> | Response;
+export type ResponseFactory = { toResponse: () => Response | Promise<Response> }; // | (() => Response | Promise<Response>);
+export type ResponseLike =
+  | Response
+  | Promise<Response>
+  | ResponseFn
+  | Promise<ResponseFn>
+  | ResponseFactory
+  | Promise<ResponseFactory>;
+export type Next = () => Promise<ResponseLike>;
+export type Middleware = (req: Req, next: Next) => Promise<ResponseLike>;
+export type Handler = (req: Req) => ResponseLike;
 
 export class BaseRoute {
   id: string = Math.random().toString(36).slice(2);
@@ -27,15 +34,6 @@ export class BaseRoute {
 export type RouteDef = {
   method: string | string[];
   url: string;
-  description?: string;
-  tags?: string[];
-  schema?: {
-    body?: JSONSchema;
-    params?: JSONSchema;
-    query?: JSONSchema;
-    headers?: JSONSchema;
-    response?: JSONSchema;
-  };
   // deno-lint-ignore no-explicit-any
   [key: string]: any;
   handler: Handler;

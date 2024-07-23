@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/raaymax/planigale/blob/main/logo.webp" title="screenshot">
+  <img src="https://raw.githubusercontent.com/raaymax/planigale/main/logo.webp" title="screenshot">
 </p>
 
 # Planigale

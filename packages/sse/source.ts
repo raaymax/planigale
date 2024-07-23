@@ -38,7 +38,7 @@ function parseMessage(message: SSEEvent, data: Record<string, string>): void {
 }
 
 export class SSESource {
-  #input: Request | string;
+  #input: Request | string | URL;
   #options: RequestInit | undefined;
   #fetch: (req: Request) => Promise<Response>;
   #abortController: AbortController;
@@ -51,7 +51,7 @@ export class SSESource {
     this.#connected = resolve;
   });
 
-  constructor(input: Request | string, opts?: SSESourceInit) {
+  constructor(input: Request | string | URL, opts?: SSESourceInit) {
     const { fetch: f = fetch, ...options } = opts ?? {};
     this.#abortController = new AbortController();
     this.#input = input;
@@ -113,9 +113,9 @@ export class SSESource {
   async #connect(): Promise<void> {
     const headers = new Headers({
       'accept': 'text/event-stream',
-      ...(typeof this.#input === 'string'
-        ? (this.#options?.headers ?? {})
-        : Object.fromEntries(this.#input.headers.entries())),
+      ...(this.#input instanceof Request
+        ? Object.fromEntries(this.#input.headers.entries())
+        : (this.#options?.headers ?? {})),
     });
 
     const req = new Request(this.#input, {

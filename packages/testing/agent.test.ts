@@ -7,13 +7,12 @@ app.route({
   method: 'GET',
   url: '/ping',
   schema: {},
-  handler: (req: Req, res: Res) => {
-    res.status = 200;
+  handler: (req: Req) => {
     const data: { ok: boolean; bar?: 'foo' } = { ok: true };
     if (req.cookies.get('foo') === 'bar') {
       data.bar = 'foo';
     }
-    res.send(data);
+    return Response.json(data);
   },
 });
 
@@ -21,10 +20,12 @@ app.route({
   method: 'POST',
   url: '/foo',
   schema: {},
-  handler: (_req: Req, res: Res) => {
+  handler: () => {
+    const res = new Res();
     res.status = 200;
     res.cookies.set('foo', 'bar');
     res.send({ bar: true });
+    return res;
   },
 });
 

@@ -8,6 +8,14 @@ export class Res {
   headers: Headers = new Headers({ 'Content-Type': 'application/json' });
   cookies: Cookies = new Cookies(this.headers);
 
+  static json(data: unknown, opts?: ResponseInit): Res {
+    const res = new Res();
+    res.body = data;
+    res.headers.set('Content-Type', 'application/json');
+    res.status = opts?.status || 200;
+    return res;
+  }
+
   send(data: unknown): Res {
     this.body = data;
     return this;
@@ -22,7 +30,7 @@ export class Res {
     return target;
   }
 
-  serialize(): Response {
+  toResponse(): Response {
     if (this.stream && this.headers.get('content-type') === 'text/event-stream') {
       return new Response(this.stream, {
         status: this.status,

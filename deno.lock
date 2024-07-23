@@ -2,6 +2,7 @@
   "version": "3",
   "packages": {
     "specifiers": {
+      "jsr:@jd1378/another-cookiejar@^5.0.7": "jsr:@jd1378/another-cookiejar@5.0.7",
       "jsr:@std/assert": "jsr:@std/assert@1.0.0",
       "jsr:@std/assert@^1.0.0": "jsr:@std/assert@1.0.0",
       "jsr:@std/async@^1.0.0-rc.1": "jsr:@std/async@1.0.0-rc.4",
@@ -24,6 +25,9 @@
       "npm:qs@^6.12.3": "npm:qs@6.12.3"
     },
     "jsr": {
+      "@jd1378/another-cookiejar@5.0.7": {
+        "integrity": "788e22828dd428aaebaedc9acbed6ae7033cc240982a10fcfc34aa72dcf01088"
+      },
       "@std/assert@1.0.0": {
         "integrity": "0e4f6d873f7f35e2a1e6194ceee39686c996b9e5d134948e644d35d4c4df2008",
         "dependencies": [
