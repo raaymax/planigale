@@ -3,6 +3,7 @@ import { Router } from './route.ts';
 import type { Next } from './route.ts';
 import { Context } from './context.ts';
 import { Req } from './req.ts';
+import { Res } from './res.ts';
 import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
 import * as Compat from './compat/mod.ts';
 
@@ -80,7 +81,7 @@ export class Planigale extends Router {
           return async () => await middleware(req, acc);
         }, async () => await ctx.route.handler(req))();
 
-      return await req.makeResponse(res);
+      return await Res.makeResponse(res);
     } catch (e) {
       return this.#handleErrors(e);
     }

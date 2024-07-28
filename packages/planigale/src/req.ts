@@ -2,7 +2,7 @@
 import { qs } from './deps.ts';
 import { ServeHandlerInfo } from './types.ts';
 import { Cookies } from './cookies.ts';
-import type { ResponseLike, Route } from './route.ts';
+import type { Route } from './route.ts';
 
 export type ReqInit = {
   ip: Req['ip'];
@@ -46,16 +46,6 @@ export class Req {
       headers: Object.fromEntries(request.headers.entries()),
       body: request.body,
     });
-  }
-
-  async makeResponse(resPromise: ResponseLike): Promise<Response> {
-    const res = await resPromise;
-    if (res instanceof Response) {
-      return res;
-    } else if (typeof res === 'function') {
-      return await res();
-    }
-    return await res.toResponse();
   }
 
   constructor(public request: Request, {

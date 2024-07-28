@@ -202,7 +202,7 @@ import { assert, assertEquals } from './deps_test.ts';
       // Setup
       app.use(async (req: Req, next: Next) => {
         req.state.data = 'middleware';
-        const res = await req.makeResponse(await next());
+        const res = await Res.makeResponse(await next());
         res.headers.set('x-middleware', 'true');
         return res;
       });

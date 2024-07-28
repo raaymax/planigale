@@ -1,9 +1,9 @@
 import { SSESink } from '@planigale/sse';
 import { Cookies } from './cookies.ts';
+import type { ResponseLike } from './route.ts';
 
 export class Res {
   body: unknown;
-  stream?: ReadableStream<Uint8Array>;
   status: number = 200;
   headers: Headers = new Headers({ 'Content-Type': 'application/json' });
   cookies: Cookies = new Cookies(this.headers);
@@ -26,13 +26,13 @@ export class Res {
     for (const [key, value] of Object.entries(target.getHeaders())) {
       this.headers.set(key, value);
     }
-    this.stream = target.getStream();
+    this.body = target.getStream();
     return target;
   }
 
   toResponse(): Response {
-    if (this.stream && this.headers.get('content-type') === 'text/event-stream') {
-      return new Response(this.stream, {
+    if (this.body instanceof ReadableStream) {
+      return new Response(this.body, {
         status: this.status,
         headers: this.headers,
       });
@@ -41,5 +41,15 @@ export class Res {
       status: this.status,
       headers: this.headers,
     });
+  }
+
+  static async makeResponse(resPromise: ResponseLike): Promise<Response> {
+    const res = await resPromise;
+    if (res instanceof Response) {
+      return res;
+    } else if (typeof res === 'function') {
+      return await res();
+    }
+    return await res.toResponse();
   }
 }
