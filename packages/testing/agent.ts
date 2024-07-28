@@ -1,6 +1,6 @@
 import type { Planigale } from '@planigale/planigale';
 import { SSESource, SSESourceInit } from '@planigale/sse';
-import { assertEquals, CookieJar, wrapFetch } from './deps.ts';
+import { assertEquals, CookieJar, mime, path, wrapFetch } from './deps.ts';
 import { formDataToBlob } from './formData.ts';
 
 const Serialize = Symbol('Serialize');
@@ -20,6 +20,9 @@ export class Agent {
 
   constructor(app: Planigale) {
     this.#app = app;
+    // this.fetch = async (req: string | URL | Request, init?: RequestInit) => {
+    //   return await app.handle(new Request(req, init));
+    // }
     this.fetch = wrapFetch({
       cookieJar: this.#cookieJar,
       fetch: async (req: string | URL | Request, init?: RequestInit) => {
@@ -41,6 +44,7 @@ export class Agent {
   }
 
   async [Startserver](): Promise<void> {
+    //this.fetch = fetch;
     this.fetch = wrapFetch({
       cookieJar: this.#cookieJar,
       fetch,
@@ -168,6 +172,7 @@ class RequestBuilder {
 class BodyBuilder {
   #headers: Record<string, string> = {};
   #body: BodyInit | null | Promise<BodyInit> = null;
+  #filePath: string | null = null;
 
   constructor(private parent: RequestBuilder) {}
 
@@ -219,12 +224,20 @@ class BodyBuilder {
     return new HeadersBuilder(this);
   }
 
-  file(body: BodyInit): HeadersBuilder {
-    this.#body = body;
+  file(path: string): HeadersBuilder {
+    this.#filePath = path;
     return new HeadersBuilder(this);
   }
 
   async [Serialize](): Promise<Request> {
+    if (this.#filePath) {
+      const file = await Deno.open(this.#filePath);
+      const fileInfo = await file.stat();
+      this.#headers['Content-Type'] = mime.contentType(path.extname(this.#filePath)) || 'application/octet-stream';
+      this.#headers['Content-Length'] = fileInfo.size.toString();
+      this.#headers['Content-Disposition'] = `attachment; filename="${path.basename(this.#filePath)}"`;
+      this.#body = file.readable;
+    }
     return new Request(this.parent[Serialize](), {
       headers: new Headers(this.#headers),
       body: await this.#body,
@@ -258,6 +271,7 @@ class HeadersBuilder {
 
   async [Serialize](): Promise<Request> {
     const req = await this.parent[Serialize]();
+
     return new Request(req, {
       headers: new Headers({
         ...Object.fromEntries(req.headers.entries()),

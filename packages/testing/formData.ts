@@ -30,7 +30,6 @@ export async function formDataToBlob(formData: FormData): Promise<Blob> {
         prefix + escape(name) + `"; filename="${escape(value.name, true)}"` +
           `\r\nContent-Type: ${value.type || 'application/octet-stream'}\r\n\r\n`,
       ));
-      console.log(value, 'serialized');
       chunks.push(await value.arrayBuffer());
       chunks.push(enc.encode('\r\n'));
     }
