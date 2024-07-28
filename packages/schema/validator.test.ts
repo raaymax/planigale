@@ -39,6 +39,37 @@ import { bodyParser } from '@planigale/body-parser';
     });
   });
 
+  Deno.test(`[VALIDATION] [${Testing.name}] Query validation`, async () => {
+    const app = new Planigale();
+    const validator = new SchemaValidator();
+    app.use(validator.middleware);
+    app.route({
+      method: 'POST',
+      url: '/query',
+      schema: {
+        query: {
+          type: 'object',
+          required: ['data'],
+          properties: {
+            data: { type: 'number' },
+          },
+        },
+      },
+      handler: async (req: Req) => {
+        assertEquals(typeof req.query.data, 'number');
+        assertEquals(req.query.data, 123);
+        return Response.json({ ok: true });
+      },
+    });
+
+    await Agent.server(app, async (agent) => {
+      await agent.request()
+        .post('/query?data=123')
+        .json({ data: 'oko' })
+        .expect(200, { ok: true });
+    });
+  });
+
   Deno.test(`[VALIDATION] [${Testing.name}] Body validation failed`, async () => {
     const app = new Planigale();
     const validator = new SchemaValidator();
