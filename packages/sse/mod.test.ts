@@ -112,7 +112,7 @@ Deno.test('[SSE] Gracefull closing by sink', async () => {
   assertEquals(done, true);
 });
 
-Deno.test('[SSE] Gracefull closing by source', async () => {
+Deno.test('[SSE][HTTP] Gracefull closing by source', async () => {
   const sink = new SSESink();
   const srv = Deno.serve({ port: 0, onListen: () => {} }, () => sink.toResponse());
   const requestInit = new Request(`http://127.0.0.1:${srv.addr.port}/sse`);
@@ -122,6 +122,21 @@ Deno.test('[SSE] Gracefull closing by source', async () => {
   await source.close();
   await closed;
   await srv.shutdown();
+});
+
+Deno.test('[SSE][HANDLER] Gracefull closing by source', async () => {
+  let streamClosed = false;
+  const stream = new ReadableStream<Uint8Array>({
+    cancel() {
+      streamClosed = true;
+    }
+  });
+
+  const res = new Response(stream, { headers: { 'Content-Type': 'text/event-stream' } });
+  const source = new SSESource(`http://127.0.0.1/sse`, {fetch: async () => res});
+  await source.connected;
+  await source.close();
+  assert(streamClosed);
 });
 
 Deno.test('[SSE] Gracefull closing by source before connection', async () => {

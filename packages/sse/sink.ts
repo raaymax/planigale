@@ -13,8 +13,8 @@ export class SSESink extends EventTarget {
         this.ctl = controller;
       },
       cancel: () => {
-        this.dispatchEvent(new Event('close'));
         clearTimeout(this.#keepAliveTimer);
+        this.dispatchEvent(new Event('close'));
         this.ctl?.close();
       },
     });
