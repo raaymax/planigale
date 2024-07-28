@@ -4,6 +4,11 @@ import { Agent } from './agent.ts';
 
 const app = new Planigale();
 
+const __dirname = new URL('.', import.meta.url).pathname;
+
+// set pwd to __dirname
+Deno.chdir(__dirname);
+
 app.route({
   method: 'GET',
   url: '/ping',
