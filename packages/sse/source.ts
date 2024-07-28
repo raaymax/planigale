@@ -51,7 +51,7 @@ class SSEDecoderStream extends TransformStream<string, SSEEvent> {
         const type = idx === -1 ? chunk : chunk.slice(0, idx);
         const val = idx === -1 ? '' : chunk.slice(idx + 1).trim();
         parseMessage(this.event, { [type]: val });
-      }
+      },
     });
   }
 }
@@ -62,10 +62,10 @@ async function* abortable(
   signal.throwIfAborted();
   const { promise, reject } = Promise.withResolvers<never>();
   const abort = () => reject(signal.reason);
-  signal.addEventListener("abort", abort, { once: true });
+  signal.addEventListener('abort', abort, { once: true });
 
-  const reader = p.getReader()
-  try{
+  const reader = p.getReader();
+  try {
     while (true) {
       const { done, value } = await Promise.race([promise, reader.read()]);
       if (done) {
@@ -73,10 +73,10 @@ async function* abortable(
       }
       yield value;
     }
-  }catch(e){
+  } catch (e) {
     throw e;
-  }finally {
-    signal.removeEventListener("abort", abort);
+  } finally {
+    signal.removeEventListener('abort', abort);
     reader.releaseLock();
   }
 }
@@ -96,7 +96,7 @@ export class SSESource {
   constructor(input: Request | string | URL, opts?: SSESourceInit) {
     const { fetch: f = fetch, ...options } = opts ?? {};
     this.#abortController = new AbortController();
-    ({promise: this.connected, resolve: this.#connected} = Promise.withResolvers<void>());
+    ({ promise: this.connected, resolve: this.#connected } = Promise.withResolvers<void>());
     opts?.signal?.addEventListener('abort', () => this.#abortController.abort(), { once: true });
     this.#input = input;
     this.#options = options;
@@ -154,21 +154,20 @@ export class SSESource {
       .pipeThrough(new TextLineStream({ allowCR: true }))
       .pipeThrough(new SSEDecoderStream());
 
-
     this.#connected();
 
     try {
       for await (const event of abortable(this.#stream, this.#abortController.signal)) {
         this.dispatch({ type: 'event', ...event });
       }
-    } catch (e){
+    } catch (e) {
       this.dispatch({ type: 'error', error: e });
     } finally {
       try {
-        await this.#stream.cancel()
-      } catch(e) {
+        await this.#stream.cancel();
+      } catch (e) {
         this.dispatch({ type: 'error', error: e });
-      };
+      }
     }
   }
 
@@ -213,4 +212,3 @@ export class SSESource {
     });
   }
 }
-

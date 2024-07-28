@@ -129,11 +129,11 @@ Deno.test('[SSE][HANDLER] Gracefull closing by source', async () => {
   const stream = new ReadableStream<Uint8Array>({
     cancel() {
       streamClosed = true;
-    }
+    },
   });
 
   const res = new Response(stream, { headers: { 'Content-Type': 'text/event-stream' } });
-  const source = new SSESource(`http://127.0.0.1/sse`, {fetch: async () => res});
+  const source = new SSESource(`http://127.0.0.1/sse`, { fetch: async () => res });
   await source.connected;
   await source.close();
   assert(streamClosed);
