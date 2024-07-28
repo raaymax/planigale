@@ -32,42 +32,32 @@ deno add @planigale/planigale
 
 ### NPM
 
-> [!CAUTION]
-> Node compatibility is not yet implemented.
-
-Planigale is also available on NPM. To use it, you need to install it first:
-```bash
-npm install planigale
-```
-Then you can import it in your project:
-```typescript
-import { Planigale } from "planigale";
-```
-
+Maybe in future
 
 ### Basic example
 
 ```typescript
-import { Planigale } from "@planigale/planigale";
+import { Planigale } from "jsr:@planigale/planigale";
 
 const app = new Planigale();
 
 // Simple logging middleware
-app.use(async (req, res) => {
+app.use(async (req, next) => {
     const ts = new Date().toISOString();
     const log = ts+ ": "+ req.method + " " + req.url;
     console.time(log);
-    await req.next();
+    const res = await next();
     console.timeEnd(log);
+    return res;
 });
 
 
 app.route({
   method: "GET",
   url: "/users/:id",
-  handler: async (req, res) => {
+  handler: async (req) => {
     const id = req.params.id;
-    res.send({ id });
+    return Response.json({ id });
   },
 })
 
@@ -78,13 +68,12 @@ app.serve({port: 8000});
 
 Routes are meant to produce a response to a particular request. They are defined by the `route` method of the app object. The method takes an object with the following properties:
 ```typescript
-{
+type RouteDefinition = {
   method: string,
   url: string,
   description?: string,
-  tags?: string[],
   schema?: object,
-  handler: (req: Request, res: Response) => void,
+  handler: (req: Req) => Promise<Res | Response>,
 }
 ```
 
@@ -116,9 +105,9 @@ app.route({
       },
     }
   },
-  handler: async (req, res) => {
+  handler: async (req) => {
     const id = req.params.id;
-    res.send({ id });
+    return Response.json({ id })
   },
 })
 
@@ -164,24 +153,12 @@ Middleware is a function that has access to the request object, the response obj
 
 
 ```typescript
-app.use(async (req, res, next) => {
-    console.log("Before");
-    await next();
-    console.log("After");
+app.use(async (req, next) => {
+    console.log("Before", req.url);
+    const res = await next();
+    console.log("After", req.url);
+    return res;
 });
-
-## Automatic docs generation
-
-Planigale can generate OpenAPI 3.0 documentation for your API. Just add `docs` method to your app and visit `/docs` endpoint.
-
-```typescript
-app.docs('/docs', { enabled: Deno.env.get("LOCAL_ENV") === "true" })
-```
-
-## Injecting dependencies
-
-TBA
-
 
 ## Testing
 
@@ -196,17 +173,16 @@ const app = new Planigale();
 const route = app.route({
   method: "GET",
   url: "/users/:id",
-  handler: async (req, res) => {
+  handler: async (req) => {
     const id = req.params.id;
     const id = req.state.user.name;
-    res.send({ id, name });
+    return Res.json({ id, name });
   },
 })
 
 Deno.test("Chaking endpoints output", async () => {
     const req = new Req("/users/1", {method: "GET", state: {user: {name: "John"}}});
-    const res = new Res();
-    await route.handler(req, res);
+    const res = await route.handler(req);
     assertEquals(res.status, 200);
     assertEquals(res.body, { id: "1", name: "john" });
 })
@@ -225,9 +201,9 @@ const app = new Planigale();
 app.route({
   method: "GET",
   url: "/users/:id",
-  handler: async (req, res) => {
+  handler: async (req) => {
     const id = req.params.id;
-    res.send({ id });
+    return Res.json({ id });
   },
 })
 
@@ -287,7 +263,7 @@ Deno.test("Chaking full app", async (t) => {
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
 3. Make your changes and add tests
-4. Run tests: `deno task test`
+4. Run tests: `deno task check`
 5. Commit your changes: `git commit -am 'feat: add some feature'`
     // use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
 6. Push to the branch: `git push origin my-new-feature`
