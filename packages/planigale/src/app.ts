@@ -9,7 +9,6 @@ import * as Compat from './compat/mod.ts';
 import { FindSymbol } from './symbols.ts';
 
 /**
- * @module Planigale
  * Planigale main class to create a new instance of the server.
  *
  * @example
