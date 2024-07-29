@@ -43,8 +43,5 @@ export class EndContext extends Context {
     req.params = match?.pathname.groups ?? {};
     req.path = match?.pathname.input ?? '';
     req.route = this.route;
-
-    // TODO: store also context information in req for middleware use?
-    req.context = this;
   }
 }

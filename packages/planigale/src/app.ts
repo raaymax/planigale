@@ -6,6 +6,7 @@ import { Req } from './req.ts';
 import { Res } from './res.ts';
 import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
 import * as Compat from './compat/mod.ts';
+import { FindSymbol } from './symbols.ts';
 
 /**
  * @module Planigale
@@ -68,7 +69,7 @@ export class Planigale extends Router {
   ): Promise<Response> => {
     try {
       const req = await Req.fromRequest(request, info);
-      const ctx = this.find(req, new Context());
+      const ctx = this[FindSymbol](req, new Context());
       if (!ctx) {
         throw new ResourceNotFound('Resource not found');
       }

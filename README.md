@@ -24,23 +24,23 @@
 
 Minimalistic HTTP framework for Deno
 
-### Planigale
+### `@planigale/planigale`
 
 Main package with the core functionality, including routing, middleware, and request handling.
 
-### SSE
+### `@planigale/sse`
 
 Server-Sent Events Source and Sink this package is not bound to Planigale and can be used with any Deno server framework or in browser. It's entirely based on WEB API.
 
-### Testing
+### `@planigale/testing`
 
 Superagent inspired testing library for Planigale. It allows you to test your application with and without running the server.
 
-### Body Parser
+### `@planigale/body-parser`
 
 Middleware for Planigale that parses request body into JSON, text, or form data.
 
-### Schema
+### `@planigale/schema`
 
 Middleware for Planigale that validates request body against JSON schema using ajv.
 
