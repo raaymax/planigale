@@ -15,11 +15,11 @@ type ReqInit = {
 };
 
 /**
-  * Request object wrapper that provides a more convenient API for working with incoming requests.
-  * It provides access to the URL, path, cookies, query parameters, headers, and body of the request.
-  * It also provides a way to store additional information in the request object.
-  * Route object to which the request is directed is also accessible through this object.
-  */
+ * Request object wrapper that provides a more convenient API for working with incoming requests.
+ * It provides access to the URL, path, cookies, query parameters, headers, and body of the request.
+ * It also provides a way to store additional information in the request object.
+ * Route object to which the request is directed is also accessible through this object.
+ */
 export class Req {
   /** IP address of the client that sent the request. */
   ip: Deno.NetAddr | string = '';
@@ -44,13 +44,12 @@ export class Req {
   /** Additional information that can be stored in the request object. */
   state: any = {};
 
-
   /**
-    * Create a new req object from a URL and options object.
-    * @param url - URL of the request.
-    * @param opts - RequestInit with state.
-    * @returns A promise that resolves to a new Req object.
-    */
+   * Create a new req object from a URL and options object.
+   * @param url - URL of the request.
+   * @param opts - RequestInit with state.
+   * @returns A promise that resolves to a new Req object.
+   */
   static async from(url: string | URL, { state, ...opts }: RequestInit & { state: any }): Promise<Req> {
     const request = new Request(url, opts);
     const req = await Req.fromRequest(request);
@@ -59,11 +58,11 @@ export class Req {
   }
 
   /**
-    * Create a new req object from a Request object.
-    * @param request - Request object.
-    * @param info - optional ServeHandlerInfo object.
-    * @returns A promise that resolves to a new Req object.
-    */
+   * Create a new req object from a Request object.
+   * @param request - Request object.
+   * @param info - optional ServeHandlerInfo object.
+   * @returns A promise that resolves to a new Req object.
+   */
   static async fromRequest(request: Request, info?: ServeHandlerInfo): Promise<Req> {
     const url = new URL(request.url);
     return new Req(request, {
@@ -78,11 +77,11 @@ export class Req {
   }
 
   /**
-    * Create a new req object.
-    * @internal
-    * @param request - Request object.
-    * @param init - Initialization object.
-    */
+   * Create a new req object.
+   * @internal
+   * @param request - Request object.
+   * @param init - Initialization object.
+   */
   private constructor(public request: Request, init: ReqInit) {
     this.ip = init.ip;
     this.method = request.method;

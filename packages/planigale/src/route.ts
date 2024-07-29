@@ -29,8 +29,8 @@ export class BaseRoute {
   #middlewares: Middleware[] = [];
 
   /** This method is used to attach middleware to the route or router.
-    * @param middleware - Middleware function.
-    */
+   * @param middleware - Middleware function.
+   */
   use(middleware: Middleware): void {
     this.#middlewares.unshift(middleware);
   }
@@ -57,7 +57,7 @@ export type RouteDef = {
 };
 
 /** This class is used to create a new route.
-  */
+ */
 export class Route extends BaseRoute {
   /** Route definition object. */
   definition: RouteDef;
@@ -65,18 +65,18 @@ export class Route extends BaseRoute {
   handler: Handler;
 
   /** Create a new route object.
-    * @param def - Route definition object.
-    * @example
-    * ```ts
-    * const app = new Planigale();
-    * const route = new Route({
-    *   url: '/',
-    *   method: 'GET',
-    *   handler: (req, res) => res.send('Hello World!')
-    * });
-    * app.use(route);
-    * ```
-    */
+   * @param def - Route definition object.
+   * @example
+   * ```ts
+   * const app = new Planigale();
+   * const route = new Route({
+   *   url: '/',
+   *   method: 'GET',
+   *   handler: (req, res) => res.send('Hello World!')
+   * });
+   * app.use(route);
+   * ```
+   */
   constructor(def: RouteDef) {
     super();
     this.definition = def;
@@ -102,8 +102,8 @@ export class Route extends BaseRoute {
 }
 
 /** This class is used to create a new router.
-  * Can be used to aggregate middlewares, routes and other routers.
-  */
+ * Can be used to aggregate middlewares, routes and other routers.
+ */
 export class Router extends BaseRoute {
   #routes: { route: BaseRoute; url: string }[] = [];
 

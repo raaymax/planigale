@@ -1,2 +1,1 @@
-
-export const FindSymbol = Symbol("FindSymbol");
+export const FindSymbol = Symbol('FindSymbol');
