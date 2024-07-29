@@ -15,7 +15,7 @@ type ReqInit = {
 };
 
 /**
- * Request object wrapper that provides a more convenient API for working with incoming requests.
+ * {@linkcode Request} object wrapper that provides a more convenient API for working with incoming requests.
  * It provides access to the URL, path, cookies, query parameters, headers, and body of the request.
  * It also provides a way to store additional information in the request object.
  * Route object to which the request is directed is also accessible through this object.
@@ -46,8 +46,8 @@ export class Req {
 
   /**
    * Create a new req object from a URL and options object.
-   * @param url - URL of the request.
-   * @param opts - RequestInit with state.
+   * @param url - string or {@linkcode URL} of the request.
+   * @param opts - {@linkcode RequestInit} with state.
    * @returns A promise that resolves to a new Req object.
    */
   static async from(url: string | URL, { state, ...opts }: RequestInit & { state: any }): Promise<Req> {
@@ -59,8 +59,8 @@ export class Req {
 
   /**
    * Create a new req object from a Request object.
-   * @param request - Request object.
-   * @param info - optional ServeHandlerInfo object.
+   * @param request - {@linkcode Request} object.
+   * @param info - optional {@linkcode Deno.ServeHandlerInfo} object.
    * @returns A promise that resolves to a new Req object.
    */
   static async fromRequest(request: Request, info?: ServeHandlerInfo): Promise<Req> {
@@ -79,7 +79,7 @@ export class Req {
   /**
    * Create a new req object.
    * @internal
-   * @param request - Request object.
+   * @param request - {@linkcode Request} object.
    * @param init - Initialization object.
    */
   private constructor(public request: Request, init: ReqInit) {

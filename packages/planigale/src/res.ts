@@ -15,7 +15,7 @@ export class Res {
 
   /** Create a new response in JSON format with status code opts.status or 200.
    * @param data - The data to send in the response body.
-   * @param opts - Options for the response.
+   * @param opts - Options for the response {@linkcode ReponseInit}.
    * @returns The Res instance.
    */
   static json(data: unknown, opts?: ResponseInit): Res {
@@ -65,8 +65,8 @@ export class Res {
   }
 
   /**
-   * Converts the res instance to a Fetch API Response.
-   * @returns The Fetch API Response.
+   * Converts the res instance to a Fetch API {@linkcode Reponse}.
+   * @returns The Fetch API {@linkcode Reponse}.
    */
   toResponse(): Response {
     if (this.body instanceof ReadableStream) {

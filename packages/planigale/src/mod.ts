@@ -1,6 +1,6 @@
 /**
- * @module Planigale
  * Planigale is a web framework for Deno, inspired by Express.js, Fastify, and Oak.
+ * @module Planigale
  */
 
 export * from './app.ts';
