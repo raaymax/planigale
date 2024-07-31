@@ -33,7 +33,7 @@ export class Agent {
             if (prop === 'url') {
               return req.url;
             }
-            if ( prop in target ) {
+            if (prop in target) {
               return target[prop as keyof typeof target];
             }
             return undefined;
