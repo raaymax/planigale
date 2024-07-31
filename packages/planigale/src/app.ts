@@ -52,11 +52,10 @@ export class Planigale extends Router {
   #srv: HttpServer<Deno.NetAddr> | null = null;
   #strictMode = false;
 
-  constructor({strict = false} = {}) {
+  constructor({ strict = false } = {}) {
     super();
     this.#strictMode = strict;
   }
-
 
   /** This method is used to handle incoming requests. It will return a response object.
    * You can use this method to handle requests manually. Request and Response objects are the same as in fetch API.
