@@ -1,7 +1,7 @@
 import { ApiError, InternalServerError, ResourceNotFound } from './errors.ts';
 import { Router } from './route.ts';
 import type { Next } from './route.ts';
-import { Context } from './context.ts';
+import { Context, RootContext } from './context.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
 import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
@@ -50,6 +50,13 @@ import { FindSymbol } from './symbols.ts';
  */
 export class Planigale extends Router {
   #srv: HttpServer<Deno.NetAddr> | null = null;
+  #strictMode = false;
+
+  constructor({strict = false} = {}) {
+    super();
+    this.#strictMode = strict;
+  }
+
 
   /** This method is used to handle incoming requests. It will return a response object.
    * You can use this method to handle requests manually. Request and Response objects are the same as in fetch API.
@@ -68,7 +75,7 @@ export class Planigale extends Router {
   ): Promise<Response> => {
     try {
       const req = await Req.fromRequest(request, info);
-      const ctx = this[FindSymbol](req, new Context());
+      const ctx = this[FindSymbol](req, new RootContext(this.#strictMode));
       if (!ctx) {
         throw new ResourceNotFound('Resource not found');
       }

@@ -90,7 +90,14 @@ export class Route extends BaseRoute {
 
   /** @ignore */
   [FindSymbol](req: Req, ctx: Context): EndContext | undefined {
-    const pattern = new URLPattern({ pathname: ctx.url + this.definition.url });
+    const makeOptionalSlash = (url: string) => {
+      if (ctx.strictMode) return url;
+      let out = url;
+      if (url.endsWith('/')) out = url.slice(0, -1);
+      return out + '{/}?';
+    };
+
+    const pattern = new URLPattern({ pathname: makeOptionalSlash(ctx.url + this.definition.url) });
     if (
       pattern.test(req.url) &&
       this.method.includes(req.method)

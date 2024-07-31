@@ -437,3 +437,117 @@ Deno.test({
     }
   },
 });
+
+Deno.test({
+  name: `Strict mode url matching`,
+  fn: async (t) => {
+    const app = new Planigale({strict: true});
+    // Setup
+    app.route({
+      method: 'GET',
+      url: '/test',
+      schema: {},
+      handler: async () => {
+        return Response.json({ ok: true });
+      },
+    });
+
+    app.route({
+      method: 'GET',
+      url: '/trailing/',
+      schema: {},
+      handler: async () => {
+        return Response.json({ ok: true });
+      },
+    });
+
+    await t.step('/test should match url without trailing /', async () => {
+      const baseUrl = `http://localhost`;
+      const req = new Request(`${baseUrl}/test`);
+      const res = await app.handle(req);
+      assertEquals(res.status, 200);
+      assertEquals(await res.json(), { ok: true });
+    });
+
+    await t.step('/test should not match url with trailing /', async () => {
+      const baseUrl = `http://localhost`;
+      const req = new Request(`${baseUrl}/test/`);
+      const res = await app.handle(req);
+      assertEquals(res.status, 404);
+      await res.body?.cancel();
+    });
+
+    await t.step('/trailing/ should not match url without trailing /', async () => {
+      const baseUrl = `http://localhost`;
+      const req = new Request(`${baseUrl}/trailing`);
+      const res = await app.handle(req);
+      assertEquals(res.status, 404);
+      await res.body?.cancel();
+    });
+
+    await t.step('/trailing/ should match url with trailing /', async () => {
+      const baseUrl = `http://localhost`;
+      const req = new Request(`${baseUrl}/trailing/`);
+      const res = await app.handle(req);
+      assertEquals(res.status, 200);
+      assertEquals(await res.json(), { ok: true });
+    });
+  },
+});
+
+Deno.test({
+  name: `non-Strict mode url matching (default)`,
+  fn: async (t) => {
+    const app = new Planigale({strict: false});
+    // Setup
+    app.route({
+      method: 'GET',
+      url: '/test',
+      schema: {},
+      handler: async () => {
+        return Response.json({ ok: true });
+      },
+    });
+
+    app.route({
+      method: 'GET',
+      url: '/trailing/',
+      schema: {},
+      handler: async () => {
+        return Response.json({ ok: true });
+      },
+    });
+
+    await t.step('/test should match url without trailing /', async () => {
+      const baseUrl = `http://localhost`;
+      const req = new Request(`${baseUrl}/test`);
+      const res = await app.handle(req);
+      assertEquals(res.status, 200);
+      assertEquals(await res.json(), { ok: true });
+    });
+
+    await t.step('/test should match url with trailing /', async () => {
+      const baseUrl = `http://localhost`;
+      const req = new Request(`${baseUrl}/test/`);
+      const res = await app.handle(req);
+      assertEquals(res.status, 200);
+      assertEquals(await res.json(), { ok: true });
+    });
+
+    await t.step('/trailing/ should match url without trailing /', async () => {
+      const baseUrl = `http://localhost`;
+      const req = new Request(`${baseUrl}/trailing`);
+      const res = await app.handle(req);
+      assertEquals(res.status, 200);
+      assertEquals(await res.json(), { ok: true });
+    });
+
+    await t.step('/trailing/ should match url with trailing /', async () => {
+      const baseUrl = `http://localhost`;
+      const req = new Request(`${baseUrl}/trailing/`);
+      const res = await app.handle(req);
+      assertEquals(res.status, 200);
+      assertEquals(await res.json(), { ok: true });
+    });
+  },
+});

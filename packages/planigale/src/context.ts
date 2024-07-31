@@ -28,8 +28,25 @@ export class Context {
     ].filter(Boolean) as BaseRoute[];
   }
 
+  get strictMode(): boolean {
+    return this.parent?.strictMode ?? false;
+  }
+
   get url(): string {
     return (this.parent?.url ?? '') + this.#url;
+  }
+}
+
+export class RootContext extends Context {
+  #strictMode: boolean;
+
+  constructor(strictMode: boolean = false) {
+    super('');
+    this.#strictMode = strictMode;
+  }
+
+  get strictMode(): boolean {
+    return this.#strictMode;
   }
 }
 
