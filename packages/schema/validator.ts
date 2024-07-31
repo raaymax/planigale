@@ -1,4 +1,4 @@
-import { Ajv, type Options, type ValidateFunction } from './deps.ts';
+import { Ajv, AnySchema, type Options, type ValidateFunction } from './deps.ts';
 import { type Middleware, type Next, type Req, type Route, ValidationFailed } from '@planigale/planigale';
 
 type ValidationBlock = 'body' | 'params' | 'query' | 'headers';
@@ -33,6 +33,10 @@ export class SchemaValidator {
       coerceTypes: true,
       ...opts,
     });
+  }
+
+  addSchema(schema: AnySchema | AnySchema[]) {
+    this.ajv.addSchema(schema);
   }
 
   compile(route: Route) {

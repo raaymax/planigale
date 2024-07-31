@@ -115,6 +115,59 @@ import { bodyParser } from '@planigale/body-parser';
     });
   });
 
+  Deno.test(`[VALIDATION] [${Testing.name}] Schema reference / external schemas`, async () => {
+    const app = new Planigale();
+    const validator = new SchemaValidator();
+    validator.addSchema({
+      $id: 'user',
+      type: 'object',
+      required: ['name'],
+      properties: {
+        name: { type: 'string' },
+      },
+    });
+    app.use(bodyParser);
+    app.use(validator.middleware);
+    app.route({
+      method: 'POST',
+      url: '/body',
+      schema: {
+        body: {
+          type: 'object',
+          required: ['data'],
+          properties: {
+            data: { $ref: 'user#' },
+          },
+        },
+      },
+      handler: async (_req: Req) => {
+        throw new Error('Should not be called');
+      },
+    });
+
+    await Agent.server(app, async (agent) => {
+      await agent.request()
+        .post('/body')
+        .json({ data: {id: 123} })
+        .expect(400, {
+          errorCode: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          errors: [
+            {
+              block: 'body',
+              instancePath: '/data',
+              keyword: 'required',
+              message: "must have required property 'name'",
+              params: {
+                missingProperty: 'name',
+              },
+              schemaPath: 'user#/required',
+            },
+          ],
+        });
+    });
+  });
+
   Deno.test(`[VALIDATION] [${Testing.name}] Validation error aggregation`, async () => {
     const app = new Planigale();
     const validator = new SchemaValidator();
