@@ -148,7 +148,7 @@ import { bodyParser } from '@planigale/body-parser';
     await Agent.server(app, async (agent) => {
       await agent.request()
         .post('/body')
-        .json({ data: {id: 123} })
+        .json({ data: { id: 123 } })
         .expect(400, {
           errorCode: 'VALIDATION_ERROR',
           message: 'Validation failed',
