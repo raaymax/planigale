@@ -2,6 +2,7 @@ name: version_bump
 
 permissions:
   contents: write
+  pull-requests: write
 
 on: workflow_dispatch
 
