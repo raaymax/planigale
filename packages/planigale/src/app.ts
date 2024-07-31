@@ -1,7 +1,7 @@
 import { ApiError, InternalServerError, ResourceNotFound } from './errors.ts';
 import { Router } from './route.ts';
 import type { Next } from './route.ts';
-import { Context, RootContext } from './context.ts';
+import { RootContext } from './context.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
 import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
