@@ -25,8 +25,20 @@ export class Agent {
     // }
     this.fetch = wrapFetch({
       cookieJar: this.#cookieJar,
-      fetch: async (req: string | URL | Request, init?: RequestInit) => {
-        return await app.handle(new Request(req, init));
+      fetch: async (url: string | URL | Request, init?: RequestInit) => {
+        const req = new Request(url, init);
+        const res = await app.handle(req);
+        return new Proxy<Response>(res, {
+          get(target, prop) {
+            if (prop === 'url') {
+              return req.url;
+            }
+            if ( prop in target ) {
+              return target[prop as keyof typeof target];
+            }
+            return undefined;
+          },
+        });
       },
     });
   }
@@ -72,6 +84,14 @@ export class Agent {
   static async server(app: Planigale, fn: (agent: Agent) => Promise<void>): Promise<void> {
     const agent = new Agent(app);
     await agent[Startserver]();
+    await fn(agent);
+    await agent.close();
+  }
+
+  static async test(app: Planigale, opts: {
+    type: 'http' | 'handler';
+  }, fn: (agent: Agent) => Promise<void>): Promise<void> {
+    const agent = await Agent.from(app, opts.type);
     await fn(agent);
     await agent.close();
   }
@@ -296,6 +316,7 @@ class Tester {
   expect(status: number, body?: any): Tester;
   // deno-lint-ignore no-explicit-any
   expect(arg: TestFn | number, arg2?: any): Tester {
+    const stack = new Error().stack; //?.split('\n').slice(2).join('\n') ?? '';
     if (typeof arg === 'function') {
       this.#expectations.push(arg);
     } else {
@@ -307,13 +328,21 @@ class Tester {
           assertEquals(res.status, status);
         } catch (e) {
           res.json().then(console.log).catch(console.error);
-          throw e;
+          const err = new Error(e.message);
+          err.stack = stack;
+          console.log(err.stack);
+          throw err;
         }
       });
 
       if (body) {
         this.#expectations.push(async (res: Response) => {
-          assertEquals(await res.json(), body);
+          try {
+            assertEquals(await res.json(), body);
+          } catch (e) {
+            e.stack = stack;
+            throw e;
+          }
         });
       }
     }

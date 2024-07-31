@@ -85,3 +85,38 @@ Deno.test(`[AGENT] agent should send file`, async () => {
     assertEquals(json, { bar: true });
   });
 });
+
+const types = ['http', 'handler'] as const;
+types.forEach((type) => {
+  Deno.test(`[AGENT][${type.toUpperCase()}] #test() testing request building `, async () => {
+    await Agent.test(app, { type }, async (agent: Agent) => {
+      await agent.request()
+        .get('/ping')
+        .expect(200, { ok: true });
+    });
+  });
+
+  Deno.test(`[AGENT][${type.toUpperCase()}] #test() should remember cookies`, async () => {
+    await Agent.test(app, { type }, async (agent: Agent) => {
+      await agent.request()
+        .post('/foo')
+        .json({ bar: true })
+        .expect(200, { bar: true });
+
+      await agent.request()
+        .get('/ping')
+        .expect(200, { ok: true, bar: 'foo' });
+    });
+  });
+
+  Deno.test(`[AGENT][${type.toUpperCase()}] #test() should send file`, async () => {
+    await Agent.test(app, { type }, async (agent: Agent) => {
+      const res = await agent.request()
+        .post('/foo')
+        .file('tests/testFile.txt')
+        .expect(200);
+      const json = await res.json();
+      assertEquals(json, { bar: true });
+    });
+  });
+});
