@@ -26,6 +26,16 @@ export class Res {
     return res;
   }
 
+  /**
+   * Create a new response with status code 204.
+   * @returns The Res instance.
+   */
+  static empty(): Res {
+    const res = new Res();
+    res.status = 204;
+    return res;
+  }
+
   /** Sets the body of the response.
    * @param data - The data to send in the response body.
    * @returns this

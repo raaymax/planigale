@@ -41,6 +41,12 @@ Deno.test('[Res] headers and cookies', async () => {
   assertEquals(response.headers.get('x-test'), 'test');
 });
 
+Deno.test('[Res] empty', async () => {
+  const res = Res.empty();
+  assertEquals(res.toResponse().status, 204);
+  assertEquals(res.toResponse().body, null);
+});
+
 Deno.test('[Res] event stream', async () => {
   const res = new Res();
   const target = res.sendEvents();
