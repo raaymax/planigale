@@ -1,8 +1,11 @@
 ### 2024.08.02
 
-#### @planigale/planigale 0.7.0 (minor)
+#### @planigale/body-parser 0.2.0 (minor)
 
-- BREAKING(planigale): only some methods will have body parsed
+- BREAKING(body-parser): only some methods will have body parsed
+
+#### @planigale/planigale 0.6.1 (patch)
+
 - feat(planigale): ability to add headers to ApiErrors
 - feat(planigale): added Res.empty() for 204 No Content responses
 
