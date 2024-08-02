@@ -1,4 +1,4 @@
-import { Planigale, Req } from '@planigale/planigale';
+import { Planigale, Req, Res } from '@planigale/planigale';
 import { assertEquals } from './deps_test.ts';
 import { Agent, TestingQuick, TestingSrv } from '@planigale/testing';
 import { SchemaValidator } from './validator.ts';
@@ -164,6 +164,92 @@ import { bodyParser } from '@planigale/body-parser';
               schemaPath: 'user#/required',
             },
           ],
+        });
+    });
+  });
+
+  Deno.test(`[VALIDATION] [${Testing.name}] Schema formats`, async () => {
+    const app = new Planigale();
+    const validator = new SchemaValidator();
+    validator.addFormat('f1', /test/);
+    validator.addFormat('f2', (v) => v === 'test2');
+    validator.addFormat('f3', {
+      type: 'string',
+      validate: (v) => v === 'test3',
+    });
+    app.use(bodyParser);
+    app.use(validator.middleware);
+    app.route({
+      method: 'POST',
+      url: '/body',
+      schema: {
+        body: {
+          type: 'object',
+          required: ['data'],
+          properties: {
+            data: { type: 'string', format: 'f1' },
+            data2: { type: 'string', format: 'f2' },
+            data3: { type: 'string', format: 'f3' },
+          },
+        },
+      },
+      handler: async (_req: Req) => {
+        return Res.empty();
+      },
+    });
+
+    await Agent.server(app, async (agent) => {
+      await agent.request()
+        .post('/body')
+        .json({
+          data: 'any test any',
+          data2: 'test2',
+          data3: 'test3',
+        })
+        .expect(204);
+
+      await agent.request()
+        .post('/body')
+        .json({
+          data: 'invalid',
+          data2: 'invalid',
+          data3: 'invalid',
+        })
+        .expect(400, {
+          errorCode: 'VALIDATION_ERROR',
+          errors: [
+            {
+              block: 'body',
+              instancePath: '/data',
+              keyword: 'format',
+              message: 'must match format "f1"',
+              params: {
+                format: 'f1',
+              },
+              schemaPath: '#/properties/data/format',
+            },
+            {
+              block: 'body',
+              instancePath: '/data2',
+              keyword: 'format',
+              message: 'must match format "f2"',
+              params: {
+                format: 'f2',
+              },
+              schemaPath: '#/properties/data2/format',
+            },
+            {
+              block: 'body',
+              instancePath: '/data3',
+              keyword: 'format',
+              message: 'must match format "f3"',
+              params: {
+                format: 'f3',
+              },
+              schemaPath: '#/properties/data3/format',
+            },
+          ],
+          message: 'Validation failed',
         });
     });
   });
