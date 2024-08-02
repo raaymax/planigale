@@ -151,6 +151,7 @@ export class Planigale extends Router {
       return new Response(JSON.stringify(e.serialize()), {
         status: e.status,
         headers: {
+          ...e.headers,
           'Content-Type': 'application/json',
         },
       });

@@ -11,6 +11,8 @@ export class ApiError extends Error {
   /** If the error should be logged or not. */
   log: boolean = true;
 
+  headers: Record<string, string> = {};
+
   /**
    * Create a new ApiError.
    * @param status The HTTP status code of the error.
