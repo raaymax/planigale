@@ -10,7 +10,12 @@ export const bodyParser: Middleware = async (req, next) => {
   return await next();
 };
 
+const methods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
 const loadBody = async (request: Request) => {
+  if (!methods.includes(request.method)) {
+    return request.body;
+  }
   const contentType = request.headers.get('content-type');
   if (contentType?.includes('application/json')) {
     return await request.json();
