@@ -316,7 +316,7 @@ class Tester {
   expect(status: number, body?: any): Tester;
   // deno-lint-ignore no-explicit-any
   expect(arg: TestFn | number, arg2?: any): Tester {
-    const stack = new Error().stack; //?.split('\n').slice(2).join('\n') ?? '';
+    const err = new Error();
     if (typeof arg === 'function') {
       this.#expectations.push(arg);
     } else {
@@ -328,9 +328,7 @@ class Tester {
           assertEquals(res.status, status);
         } catch (e) {
           res.json().then(console.log).catch(console.error);
-          const err = new Error(e.message);
-          err.stack = stack;
-          console.log(err.stack);
+          err.message = e.stack;
           throw err;
         }
       });
@@ -340,8 +338,8 @@ class Tester {
           try {
             assertEquals(await res.json(), body);
           } catch (e) {
-            e.stack = stack;
-            throw e;
+            err.message = e.stack;
+            throw err;
           }
         });
       }
