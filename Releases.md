@@ -1,3 +1,13 @@
+### 2024.08.17
+
+#### @planigale/planigale 0.6.2 (patch)
+
+- feat(planigale): add sending files using Res
+
+#### @planigale/testing 0.3.1 (patch)
+
+- fix(testing): error message is not visible
+
 ### 2024.08.02
 
 #### @planigale/body-parser 0.2.0 (minor)
