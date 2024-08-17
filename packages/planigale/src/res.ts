@@ -28,24 +28,24 @@ export class Res {
   }
 
   /** Create a new response from file in the file system
-  * @param filePath - The path to the file.
-  * @param opts - Options for the response {@linkcode ReponseInit}.
-  * @returns The Res instance.
-  */
+   * @param filePath - The path to the file.
+   * @param opts - Options for the response {@linkcode ReponseInit}.
+   * @returns The Res instance.
+   */
   static file(filePath: string, opts?: ResponseInit): Res {
-    try{
+    try {
       const res = new Res();
       const file = Deno.openSync(filePath);
       const fileInfo = file.statSync();
-      const headers: Record<string, string> = {}
+      const headers: Record<string, string> = {};
       headers['Content-Type'] = mime.contentType(path.extname(filePath)) || 'application/octet-stream';
       headers['Content-Length'] = fileInfo.size.toString();
       res.body = file.readable;
-      res.headers = new Headers({...headers, ...opts?.headers});
+      res.headers = new Headers({ ...headers, ...opts?.headers });
       res.status = opts?.status || 200;
       return res;
-    } catch(err) {
-      if(err.code === 'ENOENT'){
+    } catch (err) {
+      if (err.code === 'ENOENT') {
         return Res.json({ message: 'Not Found' }, { status: 404 });
       }
       throw err;

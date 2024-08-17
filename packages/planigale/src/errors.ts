@@ -38,8 +38,8 @@ export class ApiError extends Error {
   }
 
   /**
-    * Serialize the error to a api response.
-    */
+   * Serialize the error to a api response.
+   */
   toResponse(): Response {
     return Response.json(this.serialize(), { status: this.status, headers: this.headers });
   }

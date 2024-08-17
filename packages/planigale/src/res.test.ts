@@ -45,7 +45,7 @@ Deno.test('[Res] file', async () => {
   const res = Res.file('./README.md');
   assertEquals(res.toResponse().status, 200);
   assertEquals(res.toResponse().headers.get('Content-Type'), 'text/markdown; charset=UTF-8');
-  const r = res.toResponse()
+  const r = res.toResponse();
   assert(r.body instanceof ReadableStream);
   r.body.cancel();
 });
