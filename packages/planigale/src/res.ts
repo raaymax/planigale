@@ -1,6 +1,7 @@
 import { SSESink } from '@planigale/sse';
 import { Cookies } from './cookies.ts';
 import type { ResponseLike } from './route.ts';
+import { mime, path } from './deps.ts';
 
 /** A class representing a response, with methods for setting the body, status, headers, and cookies. */
 export class Res {
@@ -24,6 +25,31 @@ export class Res {
     res.headers.set('Content-Type', 'application/json');
     res.status = opts?.status || 200;
     return res;
+  }
+
+  /** Create a new response from file in the file system
+  * @param filePath - The path to the file.
+  * @param opts - Options for the response {@linkcode ReponseInit}.
+  * @returns The Res instance.
+  */
+  static file(filePath: string, opts?: ResponseInit): Res {
+    try{
+      const res = new Res();
+      const file = Deno.openSync(filePath);
+      const fileInfo = file.statSync();
+      const headers: Record<string, string> = {}
+      headers['Content-Type'] = mime.contentType(path.extname(filePath)) || 'application/octet-stream';
+      headers['Content-Length'] = fileInfo.size.toString();
+      res.body = file.readable;
+      res.headers = new Headers({...headers, ...opts?.headers});
+      res.status = opts?.status || 200;
+      return res;
+    } catch(err) {
+      if(err.code === 'ENOENT'){
+        return Res.json({ message: 'Not Found' }, { status: 404 });
+      }
+      throw err;
+    }
   }
 
   /**

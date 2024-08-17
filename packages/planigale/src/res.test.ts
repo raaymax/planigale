@@ -41,6 +41,22 @@ Deno.test('[Res] headers and cookies', async () => {
   assertEquals(response.headers.get('x-test'), 'test');
 });
 
+Deno.test('[Res] file', async () => {
+  const res = Res.file('./README.md');
+  assertEquals(res.toResponse().status, 200);
+  assertEquals(res.toResponse().headers.get('Content-Type'), 'text/markdown; charset=UTF-8');
+  const r = res.toResponse()
+  assert(r.body instanceof ReadableStream);
+  r.body.cancel();
+});
+
+Deno.test('[Res] file not exists', async () => {
+  const res = Res.file('./wrong.txt');
+  assertEquals(res.toResponse().status, 404);
+  assertEquals(res.toResponse().headers.get('Content-Type'), 'application/json');
+  assertEquals(await res.toResponse().json(), { message: 'Not Found' });
+});
+
 Deno.test('[Res] empty', async () => {
   const res = Res.empty();
   assertEquals(res.toResponse().status, 204);
