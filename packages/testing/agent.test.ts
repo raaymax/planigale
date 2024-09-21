@@ -62,6 +62,15 @@ Deno.test(`[AGENT] testing request building `, async () => {
   });
 });
 
+Deno.test(`[AGENT] ability to cancel body stream`, async () => {
+  await Agent.server(app, async (agent: Agent) => {
+    await agent.request()
+      .get('/ping')
+      .expect(200)
+      .discardBody();
+  });
+});
+
 Deno.test(`[AGENT] agent should remember cookies`, async () => {
   await Agent.server(app, async (agent: Agent) => {
     await agent.request()
