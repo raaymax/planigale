@@ -128,19 +128,15 @@ export class SSESource {
       headers,
     });
 
-    try {
-      const res = await this.#fetch(req);
-      if (res.status !== 200) {
-        throw new Error(`Unexpected status code: ${res.status}`);
-      }
-      if (res.headers.get('content-type') !== 'text/event-stream') {
-        throw new Error(`Unexpected content type: ${res.headers.get('content-type')}`);
-      }
-
-      await this.#connectBody(res);
-    } catch (e) {
-      this.dispatch({ type: 'error', error: e });
+    const res = await this.#fetch(req);
+    if (res.status !== 200) {
+      throw new Error(`Unexpected status code: ${res.status}`);
     }
+    if (res.headers.get('content-type') !== 'text/event-stream') {
+      throw new Error(`Unexpected content type: ${res.headers.get('content-type')}`);
+    }
+
+    await this.#connectBody(res);
   }
 
   async #connectBody(res: Response): Promise<void> {
