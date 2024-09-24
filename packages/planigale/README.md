@@ -4,10 +4,6 @@
 
 # Planigale
 
-> [!CAUTION]
-> This project is under heavy development and is not ready for production use.
-> Please, do not use it yet.
-
 ## Description
 
 Minimalistic HTTP framework for Deno
