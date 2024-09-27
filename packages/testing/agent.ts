@@ -84,16 +84,26 @@ export class Agent {
   static async server(app: Planigale, fn: (agent: Agent) => Promise<void>): Promise<void> {
     const agent = new Agent(app);
     await agent[Startserver]();
-    await fn(agent);
-    await agent.close();
+    try {
+      await fn(agent);
+    }catch(e){
+      throw e;
+    }finally{
+      await agent.close();
+    }
   }
 
   static async test(app: Planigale, opts: {
     type: 'http' | 'handler';
   }, fn: (agent: Agent) => Promise<void>): Promise<void> {
     const agent = await Agent.from(app, opts.type);
-    await fn(agent);
-    await agent.close();
+    try {
+      await fn(agent);
+    }catch(e){
+      throw e;
+    }finally{
+      await agent.close();
+    }
   }
 
   async useServer() {
@@ -273,7 +283,7 @@ class HeadersBuilder {
   get [Fetch](): FetchFn {
     return this.parent[Fetch];
   }
-
+  
   header(key: string, value: string): HeadersBuilder {
     this.#headers[key] = value;
     return this;
