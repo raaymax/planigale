@@ -45,7 +45,6 @@ Deno.test('[SSE] Full events sending', async () => {
   assertEquals(done2, true);
 });
 
-
 Deno.test('[SSE] Making it easier to test', async () => {
   const sink = new SSESink();
   const requestInit = new Request('http://127.0.0.1/sse');
@@ -114,8 +113,6 @@ Deno.test('[SSE][HANDLER] Gracefull closing by source', async () => {
   assert(streamClosed);
 });
 
-
-
 Deno.test('[SSE] Gracefull closing by source before connection', async () => {
   const requestInit = new Request(`http://127.0.0.1/sse`);
   const source = new SSESource(requestInit, {
@@ -138,7 +135,7 @@ Deno.test('[SSE] should fail if content-type is not text/event-stream', async ()
     },
   });
   const error = await source.next().then(() => null).catch((e) => e);
-  await source.close()
+  await source.close();
   assert(error);
   assertEquals(error.message, 'Unexpected content type: application/json');
 });

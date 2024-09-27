@@ -97,7 +97,9 @@ export class SSESource {
   constructor(input: Request | string | URL, opts?: SSESourceInit) {
     const { fetch: f = fetch, ...options } = opts ?? {};
     this.#abortController = new AbortController();
-    ({ promise: this.connected, resolve: this.#connected, reject: this.#connectionError } = Promise.withResolvers<void>());
+    ({ promise: this.connected, resolve: this.#connected, reject: this.#connectionError } = Promise.withResolvers<
+      void
+    >());
     opts?.signal?.addEventListener('abort', () => this.#abortController.abort(), { once: true });
     this.#input = input;
     this.#options = options;
@@ -123,7 +125,7 @@ export class SSESource {
       'accept': 'text/event-stream',
 
       ...(this.#options?.headers ?? {}),
-      ...(this.#input instanceof Request ? Object.fromEntries(this.#input.headers.entries()) : {})
+      ...(this.#input instanceof Request ? Object.fromEntries(this.#input.headers.entries()) : {}),
     });
 
     const req = new Request(this.#input, {
