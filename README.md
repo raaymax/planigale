@@ -6,10 +6,6 @@
 
 [![JSR @planigale](https://jsr.io/badges/@planigale)](https://jsr.io/@planigale)
 
-> [!CAUTION]
-> This project is under heavy development and is not ready for production use.
-> Please, do not use it yet.
-
 ## Packages
 
 | Package                                                | Latest version                                                                                |

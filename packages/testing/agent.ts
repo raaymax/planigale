@@ -86,9 +86,9 @@ export class Agent {
     await agent[Startserver]();
     try {
       await fn(agent);
-    }catch(e){
+    } catch (e) {
       throw e;
-    }finally{
+    } finally {
       await agent.close();
     }
   }
@@ -99,9 +99,9 @@ export class Agent {
     const agent = await Agent.from(app, opts.type);
     try {
       await fn(agent);
-    }catch(e){
+    } catch (e) {
       throw e;
-    }finally{
+    } finally {
       await agent.close();
     }
   }
@@ -283,7 +283,7 @@ class HeadersBuilder {
   get [Fetch](): FetchFn {
     return this.parent[Fetch];
   }
-  
+
   header(key: string, value: string): HeadersBuilder {
     this.#headers[key] = value;
     return this;
