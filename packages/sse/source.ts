@@ -91,21 +91,25 @@ export class SSESource {
   #stream: ReadableStream<SSEEvent> | undefined;
   #closed: Promise<void>;
   #connected: () => void;
+  #connectionError: (e: Error) => void;
   connected: Promise<void>;
 
   constructor(input: Request | string | URL, opts?: SSESourceInit) {
     const { fetch: f = fetch, ...options } = opts ?? {};
     this.#abortController = new AbortController();
-    ({ promise: this.connected, resolve: this.#connected } = Promise.withResolvers<void>());
+    ({ promise: this.connected, resolve: this.#connected, reject: this.#connectionError } = Promise.withResolvers<void>());
     opts?.signal?.addEventListener('abort', () => this.#abortController.abort(), { once: true });
     this.#input = input;
     this.#options = options;
     this.#fetch = f;
-    this.#closed = this.#loop();
+    this.#closed = this.#loop().catch((e) => {
+      this.#connectionError(e);
+    });
   }
 
   async close(): Promise<void> {
     this.#abortController.abort();
+    await this.connected.catch(() => {});
     await this.#closed;
   }
 
@@ -117,9 +121,9 @@ export class SSESource {
   async #connect(): Promise<void> {
     const headers = new Headers({
       'accept': 'text/event-stream',
-      ...(this.#input instanceof Request
-        ? Object.fromEntries(this.#input.headers.entries())
-        : (this.#options?.headers ?? {})),
+
+      ...(this.#options?.headers ?? {}),
+      ...(this.#input instanceof Request ? Object.fromEntries(this.#input.headers.entries()) : {})
     });
 
     const req = new Request(this.#input, {
@@ -130,10 +134,12 @@ export class SSESource {
 
     const res = await this.#fetch(req);
     if (res.status !== 200) {
-      throw new Error(`Unexpected status code: ${res.status}`);
+      res.body?.cancel();
+      return this.#connectionError(new Error(`Unexpected status code: ${res.status}`));
     }
     if (res.headers.get('content-type') !== 'text/event-stream') {
-      throw new Error(`Unexpected content type: ${res.headers.get('content-type')}`);
+      res.body?.cancel();
+      return this.#connectionError(new Error(`Unexpected content type: ${res.headers.get('content-type')}`));
     }
 
     await this.#connectBody(res);
@@ -141,8 +147,7 @@ export class SSESource {
 
   async #connectBody(res: Response): Promise<void> {
     if (!res.body) {
-      this.dispatch({ type: 'error', error: new Error('No response body') });
-      return;
+      return this.#connectionError(new Error('No response body'));
     }
 
     this.#stream = res.body
@@ -190,6 +195,7 @@ export class SSESource {
   }
 
   async next(): Promise<{ done: false; event: SSEEvent } | { done: true; event: null }> {
+    await this.connected;
     if (this.#waiting.length) {
       throw new Error('Already waiting for next event');
     }
