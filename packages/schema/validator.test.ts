@@ -353,4 +353,51 @@ import { bodyParser } from '@planigale/body-parser';
         });
     });
   });
+  Deno.test(`[VALIDATION] [${Testing.name}] Validation add keyword`, async () => {
+    const app = new Planigale();
+    const validator = new SchemaValidator();
+    validator.addKeyword({
+      keyword: 'customKeyword',
+      type: 'object',
+      validate: () => {
+        return false;
+      },
+    });
+    app.use(bodyParser);
+    app.use(validator.middleware);
+    app.route({
+      method: 'POST',
+      url: '/validation',
+      schema: {
+        body: {
+          type: 'object',
+          customKeyword: true,
+        },
+      },
+      handler: async (_req: Req) => {
+        throw new Error('Should not be called');
+      },
+    });
+
+    await Agent.server(app, async (agent) => {
+      await agent.request()
+        .post('/validation')
+        .json({ other: 'oko' })
+        .header('authorization', 'token')
+        .expect(400, {
+          errorCode: 'VALIDATION_ERROR',
+          errors: [
+            {
+              block: 'body',
+              instancePath: '',
+              keyword: 'customKeyword',
+              message: 'must pass "customKeyword" keyword validation',
+              params: {},
+              schemaPath: '#/customKeyword',
+            },
+          ],
+          message: 'Validation failed',
+        });
+    });
+  });
 });
