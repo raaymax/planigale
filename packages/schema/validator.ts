@@ -43,6 +43,10 @@ export class SchemaValidator {
     this.ajv.addFormat(name, format);
   }
 
+  addKeyword(definition: Parameters<Ajv['addKeyword']>[0]) {
+    this.ajv.addKeyword(definition);
+  }
+
   compile(route: Route) {
     if (this.validation[route.id]) return;
     const def = route.definition;
