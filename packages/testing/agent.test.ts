@@ -129,3 +129,23 @@ types.forEach((type) => {
     });
   });
 });
+
+Deno.test(`[AGENT] should handle errors gracefully`, async () => {
+  const close = app.close;
+  const { promise: closed, resolve } = Promise.withResolvers<void>();
+  app.close = async () => {
+    resolve();
+    close.call(app);
+  };
+  try {
+    await Agent.server(app, async (agent: Agent) => {
+      await agent.request()
+        .get('/ping')
+        .expect(500);
+    });
+  } catch (e) {
+    // do nothing
+  } finally {
+    await closed;
+  }
+});
