@@ -1,3 +1,13 @@
+### 2024.09.28
+
+#### @planigale/schema 0.1.3 (patch)
+
+- feat(schema): add custom keyword validation support
+
+#### @planigale/testing 0.3.1 (patch)
+
+- fix(testing): uncaught assertion errors in tests
+
 ### 2024.08.02
 
 #### @planigale/body-parser 0.2.0 (minor)
