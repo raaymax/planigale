@@ -143,7 +143,7 @@ Deno.test(`[AGENT] should handle errors gracefully`, async () => {
         .get('/ping')
         .expect(500);
     });
-  } catch (e) {
+  } catch {
     // do nothing
   } finally {
     await closed;
