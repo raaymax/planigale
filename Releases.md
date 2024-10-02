@@ -1,3 +1,13 @@
+### 2024.10.02
+
+#### @planigale/planigale 0.6.3 (patch)
+
+- feat(planigale): add ability to delete cookies for a specific path
+
+#### @planigale/testing 0.3.2 (patch)
+
+- feat(testing): add SSE connection for agent with auto close
+
 ### 2024.09.28
 
 #### @planigale/schema 0.1.3 (patch)
