@@ -375,7 +375,7 @@ class Tester {
     return this;
   }
 
-  async then(resolve: (res: Response) => Promise<void>, reject: (err: Error) => Promise<void>): Promise<void> {
+  async then(resolve?: (res: Response) => Promise<void>, reject?: (err: Error) => Promise<void>): Promise<void> {
     const req = await this.parent[Serialize]();
     const res = await this[Fetch](req);
     try {
@@ -383,8 +383,8 @@ class Tester {
         await expectation(res);
       }
     } catch (e) {
-      return await reject(e);
+      return await reject?.(e);
     }
-    return await resolve(res);
+    return await resolve?.(res);
   }
 }
