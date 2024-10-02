@@ -79,12 +79,12 @@ Deno.test(`[AGENT] testing sse connection cleanup`, async () => {
   let closed = false;
   await Agent.server(app, async (agent: Agent) => {
     const source = agent.connectSSE('/sse');
-    const msg = await source.next();
+    await source.next();
     const close = source.close;
     source.close = async () => {
       closed = true;
       await close.call(source);
-    }
+    };
   });
   assertEquals(closed, true);
 });

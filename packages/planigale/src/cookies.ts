@@ -1,13 +1,14 @@
 import { Cookie, deleteCookie, getCookies, setCookie } from './deps.ts';
 
 export type SetCookieOptions = Omit<Cookie, 'name' | 'value'>;
-export type DeleteCookieOptions = Pick<Cookie,
-  "path"
-  | "domain"
-  | "secure"
-  | "httpOnly"
-  | "partitioned"
-  >
+export type DeleteCookieOptions = Pick<
+  Cookie,
+  | 'path'
+  | 'domain'
+  | 'secure'
+  | 'httpOnly'
+  | 'partitioned'
+>;
 
 export class Cookies {
   constructor(private headers: Headers) {}

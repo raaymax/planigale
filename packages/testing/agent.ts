@@ -112,7 +112,7 @@ export class Agent {
   }
 
   request: () => RequestBuilder = () => new RequestBuilder(this);
-  
+
   // @deprecated: Use `connectSSE` instead it will close the connection when the agent is closed.
   events: (url: string, opts: SSESourceInit) => SSESource = (url: string, opts: SSESourceInit = {}) => {
     return new SSESource(new URL(url, this.addr), { ...opts, fetch: this.fetch });
