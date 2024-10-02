@@ -1,5 +1,11 @@
 ### 2024.10.02
 
+#### @planigale/testing 0.3.3 (patch)
+
+- fix(testing): add arguments for then should be optional
+
+### 2024.10.02
+
 #### @planigale/planigale 0.6.3 (patch)
 
 - feat(planigale): add ability to delete cookies for a specific path
