@@ -1,6 +1,7 @@
-import { assertEquals } from './deps_test.ts';
 import { Planigale, Req, Res } from '@planigale/planigale';
 import { Agent } from './agent.ts';
+import { SSESink } from '@planigale/sse';
+import { assertEquals } from './deps.ts';
 
 const app = new Planigale();
 
@@ -52,6 +53,40 @@ app.route({
     });
     return res;
   },
+});
+
+app.route({
+  method: 'GET',
+  url: '/sse',
+  schema: {},
+  handler: () => {
+    const sink = new SSESink();
+    const interval = setInterval(() => sink.sendMessage({ data: 'Test' }), 1);
+    sink.addEventListener('close', () => clearInterval(interval));
+    return sink;
+  },
+});
+
+Deno.test(`[AGENT] testing sse connection`, async () => {
+  await Agent.server(app, async (agent: Agent) => {
+    const source = agent.connectSSE('/sse');
+    const msg = await source.next();
+    assertEquals(msg.event?.data, 'Test');
+  });
+});
+
+Deno.test(`[AGENT] testing sse connection cleanup`, async () => {
+  let closed = false;
+  await Agent.server(app, async (agent: Agent) => {
+    const source = agent.connectSSE('/sse');
+    const msg = await source.next();
+    const close = source.close;
+    source.close = async () => {
+      closed = true;
+      await close.call(source);
+    }
+  });
+  assertEquals(closed, true);
 });
 
 Deno.test(`[AGENT] testing request building `, async () => {

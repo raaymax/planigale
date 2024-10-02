@@ -17,6 +17,7 @@ export class Agent {
     hostname: string;
     port: number;
   } = { transport: 'tcp', hostname: '127.0.0.1', port: 80 };
+  #connections: SSESource[] = [];
 
   constructor(app: Planigale) {
     this.#app = app;
@@ -111,12 +112,22 @@ export class Agent {
   }
 
   request: () => RequestBuilder = () => new RequestBuilder(this);
-
+  
+  // @deprecated: Use `connectSSE` instead it will close the connection when the agent is closed.
   events: (url: string, opts: SSESourceInit) => SSESource = (url: string, opts: SSESourceInit = {}) => {
     return new SSESource(new URL(url, this.addr), { ...opts, fetch: this.fetch });
   };
 
+  connectSSE: (url: string, opts?: SSESourceInit) => SSESource = (url: string, opts: SSESourceInit = {}) => {
+    const con = new SSESource(new URL(url, this.addr), { ...opts, fetch: this.fetch });
+    this.#connections.push(con);
+    return con;
+  };
+
   async close(): Promise<void> {
+    for (const con of this.#connections) {
+      await con.close();
+    }
     await this.#app.close();
   }
 
