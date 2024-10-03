@@ -106,6 +106,24 @@ Deno.test(`[AGENT] ability to cancel body stream`, async () => {
   });
 });
 
+Deno.test(`[AGENT] ability to allow multiple statuses`, async () => {
+  await Agent.server(app, async (agent: Agent) => {
+    await agent.request()
+      .get('/ping')
+      .expect([204, 200])
+      .discardBody();
+  });
+});
+Deno.test(`[AGENT] without checking status code in request`, async () => {
+  await Agent.server(app, async (agent: Agent) => {
+    const ret = await agent.request()
+      .get('/ping')
+      .discardBody()
+
+    assertEquals(ret.status, 200)
+  });
+});
+
 Deno.test(`[AGENT] agent should remember cookies`, async () => {
   await Agent.server(app, async (agent: Agent) => {
     await agent.request()

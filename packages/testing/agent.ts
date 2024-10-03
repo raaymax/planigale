@@ -1,6 +1,6 @@
 import type { Planigale } from '@planigale/planigale';
 import { SSESource, SSESourceInit } from '@planigale/sse';
-import { assertEquals, CookieJar, mime, path, wrapFetch } from './deps.ts';
+import { assert, assertEquals, CookieJar, mime, path, wrapFetch } from './deps.ts';
 import { formDataToBlob } from './formData.ts';
 
 const Serialize = Symbol('Serialize');
@@ -305,7 +305,7 @@ class HeadersBuilder {
   }
 
   // deno-lint-ignore no-explicit-any
-  expect(status: number, body?: any): Tester {
+  expect(status: number | number[], body?: any): Tester {
     const tester = new Tester(this);
     return tester.expect(status, body);
   }
@@ -319,6 +319,16 @@ class HeadersBuilder {
         ...this.#headers,
       }),
     });
+  }
+
+  discardBody(): Tester {
+    const tester = new Tester(this);
+    return tester.discardBody();
+  }
+
+  async then(resolve?: (res: Response) => Promise<void>, reject?: (err: Error) => Promise<void>): Promise<void> {
+    const tester = new Tester(this);
+    return await tester.then(resolve, reject);
   }
 }
 
@@ -334,19 +344,22 @@ class Tester {
 
   expect(fn: TestFn): Tester;
   // deno-lint-ignore no-explicit-any
-  expect(status: number, body?: any): Tester;
+  expect(status: number | number[], body?: any): Tester;
   // deno-lint-ignore no-explicit-any
-  expect(arg: TestFn | number, arg2?: any): Tester {
+  expect(arg: TestFn | number | number[], arg2?: any): Tester {
     const err = new Error();
     if (typeof arg === 'function') {
       this.#expectations.push(arg);
     } else {
-      const status = arg;
+      const status = [arg].flat();
       const body = arg2;
 
       this.#expectations.push(async (res: Response) => {
         try {
-          assertEquals(res.status, status);
+          assert(
+            status.includes(res.status), 
+            `Endpoint responded with invalid status code: ${res.status} allowed codes: ${JSON.stringify(status)}`
+          );
         } catch (e) {
           res.json().then(console.log).catch(console.error);
           err.message = e.stack;
