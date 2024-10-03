@@ -4,8 +4,7 @@
 		"./packages/planigale",
 		"./packages/body-parser",
     "./packages/schema",
-    "./packages/testing",
-    "./packages/static"
+    "./packages/testing"
   ],
   "tasks": {
     "version": "deno run -A scripts/version.ts",
