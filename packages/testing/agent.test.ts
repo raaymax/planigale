@@ -118,9 +118,9 @@ Deno.test(`[AGENT] without checking status code in request`, async () => {
   await Agent.server(app, async (agent: Agent) => {
     const ret = await agent.request()
       .get('/ping')
-      .discardBody()
+      .discardBody();
 
-    assertEquals(ret.status, 200)
+    assertEquals(ret.status, 200);
   });
 });
 

@@ -357,8 +357,8 @@ class Tester {
       this.#expectations.push(async (res: Response) => {
         try {
           assert(
-            status.includes(res.status), 
-            `Endpoint responded with invalid status code: ${res.status} allowed codes: ${JSON.stringify(status)}`
+            status.includes(res.status),
+            `Endpoint responded with invalid status code: ${res.status} allowed codes: ${JSON.stringify(status)}`,
           );
         } catch (e) {
           res.json().then(console.log).catch(console.error);
