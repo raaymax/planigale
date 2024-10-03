@@ -1,3 +1,9 @@
+### 2024.10.03
+
+#### @planigale/testing 0.3.4 (patch)
+
+- feat(testing): ability to check any number of status codes
+
 ### 2024.10.02-2
 
 #### @planigale/testing 0.3.3 (patch)
