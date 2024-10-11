@@ -365,7 +365,7 @@ class Tester {
           if (e instanceof Error) {
             err.message = e.message;
           } else {
-            err.message = "Unknown error: " + e;
+            err.message = 'Unknown error: ' + e;
           }
           throw err;
         }
@@ -379,7 +379,7 @@ class Tester {
             if (e instanceof Error) {
               err.message = e.stack ?? e.message;
             } else {
-              err.message = "Unknown error: " + e;
+              err.message = 'Unknown error: ' + e;
             }
             throw err;
           }
@@ -407,7 +407,7 @@ class Tester {
       if (e instanceof Error) {
         return await reject?.(e);
       }
-      return await reject?.(new Error("" + e));
+      return await reject?.(new Error('' + e));
     }
     return await resolve?.(res);
   }

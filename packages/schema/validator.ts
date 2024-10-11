@@ -92,7 +92,7 @@ export class SchemaValidator {
           if (e instanceof Ajv.ValidationError) {
             return e.errors.map((e) => ({ ...e, block: block }));
           }
-          throw new Error("Unexpected error", {cause: e});
+          throw new Error('Unexpected error', { cause: e });
         }
       } else if (!validationResult) {
         return validate.errors
