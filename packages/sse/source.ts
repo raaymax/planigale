@@ -13,7 +13,7 @@ type SSEEvent = {
 
 type ErrorEvent = {
   type: 'error';
-  error: Error;
+  error: unknown;
 };
 
 type CloseEvent = {
