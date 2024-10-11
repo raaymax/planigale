@@ -362,7 +362,11 @@ class Tester {
           );
         } catch (e) {
           res.json().then(console.log).catch(console.error);
-          err.message = e.stack;
+          if (e instanceof Error) {
+            err.message = e.message;
+          } else {
+            err.message = "Unknown error: " + e;
+          }
           throw err;
         }
       });
@@ -372,7 +376,11 @@ class Tester {
           try {
             assertEquals(await res.json(), body);
           } catch (e) {
-            err.message = e.stack;
+            if (e instanceof Error) {
+              err.message = e.stack ?? e.message;
+            } else {
+              err.message = "Unknown error: " + e;
+            }
             throw err;
           }
         });
@@ -396,7 +404,10 @@ class Tester {
         await expectation(res);
       }
     } catch (e) {
-      return await reject?.(e);
+      if (e instanceof Error) {
+        return await reject?.(e);
+      }
+      return await reject?.(new Error("" + e));
     }
     return await resolve?.(res);
   }
