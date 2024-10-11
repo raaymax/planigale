@@ -8,6 +8,37 @@ import { bodyParser } from '@planigale/body-parser';
   TestingSrv,
   TestingQuick,
 ].forEach((Testing) => {
+  Deno.test(`[VALIDATION] [${Testing.name}] Async body validation`, async () => {
+    const app = new Planigale();
+    const validator = new SchemaValidator();
+    app.use(bodyParser);
+    app.use(validator.middleware);
+    app.route({
+      method: 'POST',
+      url: '/body',
+      schema: {
+        body: {
+          $async: true,
+          type: 'object',
+          required: ['data'],
+          properties: {
+            data: { type: 'string' },
+          },
+        },
+      },
+      handler: async (req: Req) => {
+        assertEquals(req.body.data, 'oko');
+        return Response.json({ ok: true });
+      },
+    });
+
+    await Agent.server(app, async (agent) => {
+      await agent.request()
+        .post('/body')
+        .json({ data: 'oko' })
+        .expect(200, { ok: true });
+    });
+  });
   Deno.test(`[VALIDATION] [${Testing.name}] Body validation`, async () => {
     const app = new Planigale();
     const validator = new SchemaValidator();
@@ -67,6 +98,52 @@ import { bodyParser } from '@planigale/body-parser';
         .post('/query?data=123')
         .json({ data: 'oko' })
         .expect(200, { ok: true });
+    });
+  });
+
+  Deno.test(`[VALIDATION] [${Testing.name}] Async body validation failed`, async () => {
+    const app = new Planigale();
+    const validator = new SchemaValidator();
+    app.use(bodyParser);
+    app.use(validator.middleware);
+    app.route({
+      method: 'POST',
+      url: '/body',
+      schema: {
+        body: {
+          $async: true,
+          type: 'object',
+          required: ['data'],
+          properties: {
+            data: { type: 'string' },
+          },
+        },
+      },
+      handler: async (_req: Req) => {
+        throw new Error('Should not be called');
+      },
+    });
+
+    await Agent.server(app, async (agent) => {
+      await agent.request()
+        .post('/body')
+        .json({ other: 'oko' })
+        .expect(400, {
+          errorCode: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          errors: [
+            {
+              block: 'body',
+              instancePath: '',
+              keyword: 'required',
+              message: "must have required property 'data'",
+              params: {
+                missingProperty: 'data',
+              },
+              schemaPath: '#/required',
+            },
+          ],
+        });
     });
   });
 

@@ -4,11 +4,11 @@ import { type Middleware, type Next, type Req, type Route, ValidationFailed } fr
 type ValidationBlock = 'body' | 'params' | 'query' | 'headers';
 type ValidationError = {
   block: ValidationBlock;
-  instancePath: string;
-  keyword: string;
+  instancePath?: string;
+  keyword?: string;
   message?: string;
-  params: Record<string, unknown>;
-  schemaPath: string;
+  params?: Record<string, unknown>;
+  schemaPath?: string;
 };
 
 export class SchemaValidator {
@@ -67,20 +67,20 @@ export class SchemaValidator {
   };
 
   async validate(route: Route, req: Req) {
-    const errors: ValidationError[][] = await Promise.all([
+    const errors: (ValidationError[] | null)[] = await Promise.all([
       this.#validateBlock(route, 'body', req),
       this.#validateBlock(route, 'params', req),
       this.#validateBlock(route, 'query', req),
       this.#validateBlock(route, 'headers', req),
     ]);
-    const fmtErrors: ValidationError[] = errors.flat().filter((e: ValidationError) => e !== null);
+    const fmtErrors: ValidationError[] = errors.flat().filter((e: ValidationError | null) => e !== null);
     if (fmtErrors.length) {
       throw new ValidationFailed(fmtErrors);
     }
     return;
   }
 
-  async #validateBlock(route: Route, block: ValidationBlock, req: Req) {
+  async #validateBlock(route: Route, block: ValidationBlock, req: Req): Promise<ValidationError[] | null> {
     const validate = this.validation[route.id][block];
     if (validate) {
       const validationResult: unknown = validate(req[block]);
@@ -89,7 +89,10 @@ export class SchemaValidator {
         try {
           await validationResult;
         } catch (e) {
-          return e.map((e: ValidationError) => ({ ...e, block: block }));
+          if (e instanceof Ajv.ValidationError) {
+            return e.errors.map((e) => ({ ...e, block: block }));
+          }
+          throw new Error("Unexpected error", {cause: e});
         }
       } else if (!validationResult) {
         return validate.errors
