@@ -89,7 +89,7 @@ export class Route extends BaseRoute {
   }
 
   /** @ignore */
-  [FindSymbol](req: Req, ctx: Context): EndContext | undefined {
+  override [FindSymbol](req: Req, ctx: Context): EndContext | undefined {
     const makeOptionalSlash = (url: string) => {
       if (ctx.strictMode) return url;
       let out = url;
@@ -128,7 +128,7 @@ export class Router extends BaseRoute {
    * console.log(response);
    * ```
    */
-  use(url: string, router: BaseRoute): void;
+  override use(url: string, router: BaseRoute): void;
   /** This method is used to add a new route or router to the server.
    * @param router - The router or route to be added to the server.
    * @example
@@ -141,7 +141,7 @@ export class Router extends BaseRoute {
    * console.log(response);
    * ```
    */
-  use(router: BaseRoute): void;
+  override use(router: BaseRoute): void;
   /** This method is used to add a new middleware to the server.
    * @example
    * 	```ts
@@ -153,8 +153,8 @@ export class Router extends BaseRoute {
    * });
    * ```
    */
-  use(middleware: Middleware): void;
-  use(arg: string | Middleware | BaseRoute, arg2?: BaseRoute): void {
+  override use(middleware: Middleware): void;
+  override use(arg: string | Middleware | BaseRoute, arg2?: BaseRoute): void {
     if (typeof arg === 'function') {
       super.use(arg);
     } else if (arg instanceof BaseRoute) {
@@ -185,7 +185,7 @@ export class Router extends BaseRoute {
   }
 
   /** @ignore */
-  [FindSymbol](req: Req, ctx: Context): EndContext | undefined {
+  override [FindSymbol](req: Req, ctx: Context): EndContext | undefined {
     for (const { route, url } of this.#routes) {
       const end = route[FindSymbol](req, ctx.goto(url, this));
       if (end) return end;

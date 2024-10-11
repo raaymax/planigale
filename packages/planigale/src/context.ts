@@ -45,13 +45,13 @@ export class RootContext extends Context {
     this.#strictMode = strictMode;
   }
 
-  get strictMode(): boolean {
+  override get strictMode(): boolean {
     return this.#strictMode;
   }
 }
 
 export class EndContext extends Context {
-  constructor(public pattern: URLPattern, public route: Route, parent: Context) {
+  constructor(public override pattern: URLPattern, public override route: Route, parent: Context) {
     super('', parent);
   }
   preProcess(req: Req) {

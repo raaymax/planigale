@@ -5,7 +5,6 @@ import { RootContext } from './context.ts';
 import { Req } from './req.ts';
 import { Res } from './res.ts';
 import { HttpServer, ServeHandlerInfo, ServeOptions } from './types.ts';
-import * as Compat from './compat/mod.ts';
 import { FindSymbol } from './symbols.ts';
 
 /**
@@ -105,7 +104,7 @@ export class Planigale extends Router {
 
   async serve(opts?: ServeOptions): Promise<HttpServer<Deno.NetAddr>> {
     if (!opts) opts = {};
-    const srv = await Compat.serve(opts, this.handle);
+    const srv = Deno.serve(opts, this.handle);
     srv.finished.then(() => this.#emit('close'));
     this.#srv = srv;
     return srv;
@@ -145,7 +144,7 @@ export class Planigale extends Router {
     );
   }
 
-  #handleErrors(e: Error) {
+  #handleErrors(e: unknown) {
     if (e instanceof ApiError) {
       if (e.log) console.error(e);
       return new Response(JSON.stringify(e.serialize()), {
@@ -156,12 +155,15 @@ export class Planigale extends Router {
         },
       });
     }
-    const ise = new InternalServerError(e);
-    return new Response(JSON.stringify(ise.serialize()), {
-      status: ise.status,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    if (e instanceof Error) {
+      const ise = new InternalServerError(e);
+      return new Response(JSON.stringify(ise.serialize()), {
+        status: ise.status,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+    return new Response('Internal Server Error', { status: 500 });
   }
 }

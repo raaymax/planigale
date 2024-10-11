@@ -45,7 +45,7 @@ export class Res {
       res.status = opts?.status || 200;
       return res;
     } catch (err) {
-      if (err.code === 'ENOENT') {
+      if (err instanceof Deno.errors.NotFound) {
         return Res.json({ message: 'Not Found' }, { status: 404 });
       }
       throw err;

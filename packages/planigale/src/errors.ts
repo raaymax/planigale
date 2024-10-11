@@ -58,7 +58,7 @@ export class ValidationFailed extends ApiError {
   /** The errors that caused the validation to fail. */
   errors: unknown;
   /** If the error should be logged or not. */
-  log: boolean = false;
+  override log: boolean = false;
 
   /**
    * Create a new ValidationFailed error.
@@ -70,7 +70,7 @@ export class ValidationFailed extends ApiError {
   }
 
   /** @inheritDoc */
-  serialize(): Record<string, unknown> {
+  override serialize(): Record<string, unknown> {
     return {
       ...super.serialize(),
       errors: this.errors,
@@ -95,7 +95,7 @@ export class InternalServerError extends ApiError {
   }
 
   /** @inheritDoc */
-  serialize(): Record<string, unknown> {
+  override serialize(): Record<string, unknown> {
     return {
       ...super.serialize(),
       stack: this.originalError.stack?.split('\n'),
@@ -109,7 +109,7 @@ export class InternalServerError extends ApiError {
  */
 export class ResourceNotFound extends ApiError {
   /** If the error should be logged or not. */
-  log: boolean = false;
+  override log: boolean = false;
 
   /**
    * Create a new ResourceNotFound error.
