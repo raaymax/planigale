@@ -1,3 +1,22 @@
+### 2024.10.11
+
+#### @planigale/planigale 0.6.4 (patch)
+
+- feat(planigale): upgrade to deno 2.0
+
+#### @planigale/schema 0.1.4 (patch)
+
+- feat(schema): upgrade to deno 2.0
+
+#### @planigale/sse 0.2.3 (patch)
+
+- feat(sse): upgrade to deno 2.0
+
+#### @planigale/testing 0.3.4 (patch)
+
+- feat(testing): upgrade to deno 2.0
+- feat(testing): ability to check any number of status codes
+
 ### 2024.10.02-2
 
 #### @planigale/testing 0.3.3 (patch)
