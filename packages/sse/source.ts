@@ -1,7 +1,7 @@
 import { TextLineStream } from './deps.ts';
 
 export declare interface SSESourceInit extends RequestInit {
-  fetch?: (req: Request) => Promise<Response>;
+  fetch?: typeof fetch;
 }
 
 type SSEEvent = {
@@ -84,7 +84,7 @@ async function* abortable(
 export class SSESource {
   #input: Request | string | URL;
   #options: RequestInit | undefined;
-  #fetch: (req: Request) => Promise<Response>;
+  #fetch: typeof fetch;
   #abortController: AbortController;
   #queue: InternalEvent[] = [];
   #waiting: ((ev: InternalEvent) => void)[] = [];
@@ -95,7 +95,7 @@ export class SSESource {
   connected: Promise<void>;
 
   constructor(input: Request | string | URL, opts?: SSESourceInit) {
-    const { fetch: f = fetch, ...options } = opts ?? {};
+    const { fetch: f = ((...a: Parameters<typeof fetch>) => fetch(...a)), ...options } = opts ?? {};
     this.#abortController = new AbortController();
     ({ promise: this.connected, resolve: this.#connected, reject: this.#connectionError } = Promise.withResolvers<
       void

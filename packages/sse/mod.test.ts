@@ -165,14 +165,14 @@ Deno.test('[SSE] SSESource should sent headers from request and from options', a
     headers: {
       'x-additional': 'additional',
     },
-    fetch: async (req: Request) => {
+    fetch: (async (req: Request) => {
       assertEquals(req.headers.get('Authorization'), 'Bearer token');
       assertEquals(req.headers.get('X-Custom'), 'custom');
       assertEquals(req.headers.get('Content-Type'), 'application/json');
       assertEquals(req.headers.get('Accept'), 'text/event-stream');
       assertEquals(req.headers.get('x-additional'), 'additional');
       return Response.json({}, { status: 400 });
-    },
+    }) as typeof fetch,
   });
   try {
     await source.next();
