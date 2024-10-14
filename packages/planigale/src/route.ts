@@ -100,8 +100,8 @@ export class Route extends BaseRoute {
     const pattern = new URLPattern({ pathname: makeOptionalSlash(ctx.url + this.definition.url) });
     if (
       pattern.test(req.url) && (
-        this.method.includes(req.method) 
-          || this.method.includes('*')
+        this.method.includes(req.method) ||
+        this.method.includes('*')
       )
     ) {
       return ctx.end(pattern, this);
