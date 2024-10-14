@@ -125,6 +125,52 @@ import { assert, assertEquals } from './deps_test.ts';
     }
   });
 
+  Deno.test(`[${Testing.name}] Matching any method when not defined`, async () => {
+    const app = new Planigale();
+    const { getUrl, fetch, close, listen } = new Testing(app);
+    try {
+      app.route({
+        url: '/users/:id',
+        schema: {},
+        handler: () => Response.json({ ok: true }),
+      });
+      await listen();
+      // Test
+      const res1 = await fetch(`${getUrl()}/users/oko`);
+      assertEquals(await res1.json(), {ok: true});
+      const res2 = await fetch(`${getUrl()}/users/oko`, { method: 'POST' });
+      assertEquals(await res2.json(), {ok: true});
+      const res3 = await fetch(`${getUrl()}/users/oko`, { method: 'PUT' });
+      assertEquals(await res3.json(), {ok: true});
+    } finally {
+      // Teardown
+      close();
+    }
+  });
+  Deno.test(`[${Testing.name}] Matching any method using star`, async () => {
+    const app = new Planigale();
+    const { getUrl, fetch, close, listen } = new Testing(app);
+    try {
+      app.route({
+        method: '*',
+        url: '/users/:id',
+        schema: {},
+        handler: () => Response.json({ ok: true }),
+      });
+      await listen();
+      // Test
+      const res1 = await fetch(`${getUrl()}/users/oko`);
+      assertEquals(await res1.json(), {ok: true});
+      const res2 = await fetch(`${getUrl()}/users/oko`, { method: 'POST' });
+      assertEquals(await res2.json(), {ok: true});
+      const res3 = await fetch(`${getUrl()}/users/oko`, { method: 'PUT' });
+      assertEquals(await res3.json(), {ok: true});
+    } finally {
+      // Teardown
+      close();
+    }
+  });
+
   Deno.test(`[${Testing.name}] Basic functions`, async () => {
     const app = new Planigale();
     const { getUrl, fetch, close, listen } = new Testing(app);

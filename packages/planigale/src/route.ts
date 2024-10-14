@@ -46,8 +46,8 @@ export class BaseRoute {
 
 /** Route definition object. */
 export type RouteDef = {
-  /** HTTP method of the route. */
-  method: string | string[];
+  /** HTTP method of the route. `method: '*'` matches all, same as omitting this field  */
+  method?: string | string[];
   /** URL pattern of the route. */
   url: string;
   // deno-lint-ignore no-explicit-any
@@ -85,7 +85,7 @@ export class Route extends BaseRoute {
 
   /** HTTP method of the route. */
   get method(): string[] {
-    return [this.definition.method].flat();
+    return [this.definition.method ?? '*'].flat();
   }
 
   /** @ignore */
@@ -99,8 +99,10 @@ export class Route extends BaseRoute {
 
     const pattern = new URLPattern({ pathname: makeOptionalSlash(ctx.url + this.definition.url) });
     if (
-      pattern.test(req.url) &&
-      this.method.includes(req.method)
+      pattern.test(req.url) && (
+        this.method.includes(req.method) 
+          || this.method.includes('*')
+      )
     ) {
       return ctx.end(pattern, this);
     }
