@@ -1,3 +1,10 @@
+### 2024.10.14
+
+#### @planigale/planigale 0.6.5 (patch)
+
+- feat(planigale): allow matching any method for route
+- fix(planigale): internal server error was not logged
+
 ### 2024.10.11
 
 #### @planigale/planigale 0.6.4 (patch)
