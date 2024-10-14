@@ -155,6 +155,7 @@ export class Planigale extends Router {
         },
       });
     }
+    console.error("Internal server error:", e);
     if (e instanceof Error) {
       const ise = new InternalServerError(e);
       return new Response(JSON.stringify(ise.serialize()), {
