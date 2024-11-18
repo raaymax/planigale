@@ -22,7 +22,7 @@ type ReqInit = {
  */
 export class Req {
   /** IP address of the client that sent the request. */
-  ip: Deno.NetAddr | string = '';
+  ip: Deno.NetAddr;
   /** Route object to which the request is directed. */
   route?: Route;
   /** HTTP method of the request. */
@@ -66,7 +66,11 @@ export class Req {
   static async fromRequest(request: Request, info?: ServeHandlerInfo): Promise<Req> {
     const url = new URL(request.url);
     return new Req(request, {
-      ip: info?.remoteAddr ?? '',
+      ip: info?.remoteAddr ?? {
+        hostname: 'localhost',
+        port: 0,
+        transport: 'tcp',
+      },
       path: url.pathname,
       params: {},
       cookies: new Cookies(request.headers),
