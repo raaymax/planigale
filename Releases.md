@@ -1,5 +1,15 @@
 ### 2024.10.14
 
+#### @planigale/sse 0.2.4 (patch)
+
+- fix(sse): default fetch failing on browser
+
+#### @planigale/testing 0.3.5 (patch)
+
+- fix(testing): fix types of fetch
+
+### 2024.10.14
+
 #### @planigale/planigale 0.6.5 (patch)
 
 - feat(planigale): allow matching any method for route
