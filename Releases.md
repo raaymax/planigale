@@ -1,3 +1,9 @@
+### 2024.12.27
+
+#### @planigale/planigale 0.6.7 (patch)
+
+- feat(planigale): migrate to import maps
+
 ### 2024.11.18
 
 #### @planigale/planigale 0.6.6 (patch)
