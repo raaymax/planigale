@@ -135,6 +135,11 @@
   },
   "workspace": {
     "members": {
+      "packages/body-parser": {
+        "dependencies": [
+          "jsr:@std/streams@~0.224.5"
+        ]
+      },
       "packages/planigale": {
         "dependencies": [
           "jsr:@std/assert@1",
