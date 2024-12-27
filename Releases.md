@@ -1,5 +1,19 @@
 ### 2024.12.27
 
+#### @planigale/body-parser 0.2.1 (patch)
+
+- feat(body-parser): replaced qs with querystring
+
+#### @planigale/planigale 0.6.8 (patch)
+
+- feat(planigale): replaced qs with querystring
+
+#### @planigale/querystring 0.1.0 (minor)
+
+- feat(querystring): add querystring module to replace qs
+
+### 2024.12.27
+
 #### @planigale/planigale 0.6.7 (patch)
 
 - feat(planigale): migrate to import maps
