@@ -1,4 +1,5 @@
 import { Planigale } from './app.ts';
+import { InternalServerError } from './errors.ts';
 import { Res } from './res.ts';
 import { assert, assertEquals } from '@std/assert';
 
@@ -76,4 +77,21 @@ Deno.test('[Res] event stream', async () => {
     assertEquals(new TextDecoder().decode(value), 'data:test\n\n');
   });
   target.close();
+});
+
+Deno.test('[InternalServerError] serialization', async () => {
+  const e1 = new InternalServerError(undefined);
+  const e2 = new InternalServerError('Error');
+  const e3 = new InternalServerError(null);
+  const err = new Error('test');
+  const e4 = new InternalServerError(err);
+  assertEquals(e1.serialize(), { errorCode: 'INTERNAL_SERVER_ERROR', message: 'undefined', originalError: undefined });
+  assertEquals(e2.serialize(), { errorCode: 'INTERNAL_SERVER_ERROR', message: 'Error', originalError: 'Error' });
+  assertEquals(e3.serialize(), { errorCode: 'INTERNAL_SERVER_ERROR', message: 'null', originalError: null });
+  assertEquals(e4.serialize(), {
+    errorCode: 'INTERNAL_SERVER_ERROR',
+    message: 'test',
+    originalError: err,
+    stack: err.stack?.split('\n'),
+  });
 });

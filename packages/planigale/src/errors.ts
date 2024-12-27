@@ -83,23 +83,43 @@ export class ValidationFailed extends ApiError {
  */
 export class InternalServerError extends ApiError {
   /** The original error that caused the internal server error. */
-  originalError: Error;
+  originalError: unknown;
 
   /**
    * Create a new InternalServerError.
    * @param e The original error that caused the internal server error.
    */
-  constructor(e: Error) {
-    super(500, 'INTERNAL_SERVER_ERROR', e.message);
+  constructor(e: unknown) {
+    super(500, 'INTERNAL_SERVER_ERROR', InternalServerError.extractMessage(e));
     this.originalError = e;
+  }
+
+  /**
+   * @internal
+   * Extract the message from an error.
+   */
+  static extractMessage(e: unknown): string {
+    if (e instanceof Error) {
+      return e.message;
+    } else {
+      return String(e) || 'Internal server error';
+    }
   }
 
   /** @inheritDoc */
   override serialize(): Record<string, unknown> {
-    return {
-      ...super.serialize(),
-      stack: this.originalError.stack?.split('\n'),
-    };
+    if (this.originalError instanceof Error) {
+      return {
+        ...super.serialize(),
+        stack: this.originalError.stack?.split('\n'),
+        originalError: this.originalError,
+      };
+    } else {
+      return {
+        ...super.serialize(),
+        originalError: this.originalError,
+      };
+    }
   }
 }
 
