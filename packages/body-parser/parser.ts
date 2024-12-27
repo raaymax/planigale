@@ -1,5 +1,5 @@
 import { Middleware } from '@planigale/planigale';
-import { qs } from './deps.ts';
+import * as qs from '@planigale/querystring';
 
 export const bodyParser: Middleware = async (req, next) => {
   const request = req.request;
