@@ -1,6 +1,6 @@
 {
   "name": "@planigale/planigale",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "exports": "./mod.ts",
   "imports": {
     "@types/json-schema": "npm:@types/json-schema@^7.0.15",
