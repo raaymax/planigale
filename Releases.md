@@ -1,5 +1,11 @@
 ### 2024.12.27
 
+#### @planigale/planigale 0.6.9 (patch)
+
+- feat(planigale): internal server error can be unknown
+
+### 2024.12.27
+
 #### @planigale/body-parser 0.2.1 (patch)
 
 - feat(body-parser): replaced qs with querystring
