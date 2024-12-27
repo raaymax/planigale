@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-import { default as qs } from 'qs';
+import * as qs from '@planigale/querystring';
 import { ServeHandlerInfo } from './types.ts';
 import { Cookies } from './cookies.ts';
 import type { Route } from './route.ts';

@@ -4,7 +4,6 @@
   "exports": "./mod.ts",
   "imports": {
     "@types/json-schema": "npm:@types/json-schema@^7.0.15",
-    "qs": "npm:qs@^6.12.2",
     "@std/http": "jsr:@std/http@^0.224.5",
     "@std/media-types": "jsr:@std/media-types@1.0.2",
     "@std/path": "jsr:@std/path@1.0.1",
