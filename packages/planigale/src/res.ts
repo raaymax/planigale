@@ -1,7 +1,8 @@
+import * as mime from '@std/media-types';
+import * as path from '@std/path';
 import { SSESink } from '@planigale/sse';
 import { Cookies } from './cookies.ts';
 import type { ResponseLike } from './route.ts';
-import { mime, path } from './deps.ts';
 
 /** A class representing a response, with methods for setting the body, status, headers, and cookies. */
 export class Res {

@@ -1,6 +1,6 @@
 import { Planigale } from './app.ts';
 import { Res } from './res.ts';
-import { assert, assertEquals } from './deps_test.ts';
+import { assert, assertEquals } from '@std/assert';
 
 Deno.test('[Res] res should work like Response', async () => {
   const app = new Planigale();
