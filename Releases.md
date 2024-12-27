@@ -1,3 +1,9 @@
+### 2024.11.18
+
+#### @planigale/planigale 0.6.6 (patch)
+
+- fix(planigale): ip type error in req
+
 ### 2024.10.14
 
 #### @planigale/sse 0.2.4 (patch)
