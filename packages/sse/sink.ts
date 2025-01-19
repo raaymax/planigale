@@ -3,6 +3,7 @@ import { type SSEEvent, SSEStream } from './stream.ts';
 export class SSESink extends EventTarget {
   #keepAliveTimer: number | undefined;
   #keepAliveTime = 3000;
+  #closed = false;
   stream: ReadableStream<SSEEvent>;
   ctl: ReadableStreamDefaultController<SSEEvent> | null = null;
 
@@ -13,6 +14,7 @@ export class SSESink extends EventTarget {
         this.ctl = controller;
       },
       cancel: () => {
+        this.#closed = true;
         clearTimeout(this.#keepAliveTimer);
         this.dispatchEvent(new Event('close'));
         this.ctl?.close();
@@ -23,10 +25,14 @@ export class SSESink extends EventTarget {
   }
 
   sendMessage(message: SSEEvent): void {
+    if (this.#closed) {
+      throw new Error('Sink is closed');
+    }
     this.ctl?.enqueue(message);
   }
 
   close(): void {
+    this.#closed = true;
     clearTimeout(this.#keepAliveTimer);
     this.ctl?.close();
   }
@@ -34,6 +40,9 @@ export class SSESink extends EventTarget {
   // keep-alive by sending comments
   #loop(): void {
     this.#keepAliveTimer = setTimeout(() => {
+      if (this.#closed) {
+        return;
+      }
       this.sendMessage({ comment: 'keep-alive' });
       this.#loop();
     }, this.#keepAliveTime);
