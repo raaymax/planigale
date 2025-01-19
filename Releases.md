@@ -1,3 +1,13 @@
+### 2025.01.19
+
+#### @planigale/planigale 0.6.10 (patch)
+
+- feat(planigale): better logging for internal errors
+
+#### @planigale/sse 0.2.5 (patch)
+
+- fix(sse): message sending when stream is closed
+
 ### 2024.12.27
 
 #### @planigale/planigale 0.6.9 (patch)
