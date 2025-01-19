@@ -121,6 +121,14 @@ export class InternalServerError extends ApiError {
       };
     }
   }
+
+  override toString(): string {
+    if (this.originalError instanceof Error) {
+      return `InternalServerError: ${this.message}\n${this.originalError.message}\n\n${this.originalError.stack}`;
+    } else {
+      return `InternalServerError: ${this.message}\n${this.originalError}`;
+    }
+  }
 }
 
 /**
