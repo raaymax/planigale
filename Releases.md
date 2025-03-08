@@ -1,3 +1,9 @@
+### 2025.03.08
+
+#### @planigale/testing 0.3.6 (patch)
+
+- fix(testing): types alignment after update
+
 ### 2025.01.19
 
 #### @planigale/planigale 0.6.10 (patch)
