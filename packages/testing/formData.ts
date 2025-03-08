@@ -18,7 +18,7 @@ const FORM_DETA_SERIALIZE_PATTERN = new RegExp(/\r(?!\n)|(?<!\r)\n/g);
 export async function formDataToBlob(formData: FormData): Promise<Blob> {
   const enc = new TextEncoder();
   const boundary = `${Math.random()}${Math.random()}`.replace('.', '').slice(-28).padStart(32, '-');
-  const chunks: ArrayBuffer[] = [];
+  const chunks: Uint8Array[] = [];
   const prefix = `--${boundary}\r\nContent-Disposition: form-data; name="`;
 
   for (const [name, value] of formData) {
@@ -30,7 +30,7 @@ export async function formDataToBlob(formData: FormData): Promise<Blob> {
         prefix + escape(name) + `"; filename="${escape(value.name, true)}"` +
           `\r\nContent-Type: ${value.type || 'application/octet-stream'}\r\n\r\n`,
       ));
-      chunks.push(await value.arrayBuffer());
+      chunks.push(await value.bytes());
       chunks.push(enc.encode('\r\n'));
     }
   }
