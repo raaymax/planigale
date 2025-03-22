@@ -1,3 +1,9 @@
+### 2025.03.22
+
+#### @planigale/sse 0.2.6 (patch)
+
+- feat(sse): disconnect source by keep-alive
+
 ### 2025.03.08
 
 #### @planigale/testing 0.3.6 (patch)
