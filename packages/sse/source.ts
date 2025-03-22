@@ -2,6 +2,7 @@ import { TextLineStream } from './deps.ts';
 
 export declare interface SSESourceInit extends RequestInit {
   fetch?: typeof fetch;
+  keepAliveTimeout?: number;
 }
 
 type SSEEvent = {
@@ -92,6 +93,8 @@ export class SSESource {
   #closed: Promise<void>;
   #connected: () => void;
   #connectionError: (e: Error) => void;
+  #keepAliveTime: number = 10000;
+  #keepAliveTimeout: number | undefined;
   connected: Promise<void>;
 
   constructor(input: Request | string | URL, opts?: SSESourceInit) {
@@ -103,6 +106,9 @@ export class SSESource {
     opts?.signal?.addEventListener('abort', () => this.#abortController.abort(), { once: true });
     this.#input = input;
     this.#options = options;
+    if (opts?.keepAliveTimeout) {
+      this.#keepAliveTime = opts.keepAliveTimeout;
+    }
     this.#fetch = f;
     this.#closed = this.#loop().catch((e) => {
       this.#connectionError(e);
@@ -110,6 +116,7 @@ export class SSESource {
   }
 
   async close(): Promise<void> {
+    clearTimeout(this.#keepAliveTimeout);
     this.#abortController.abort();
     await this.connected.catch(() => {});
     await this.#closed;
@@ -160,12 +167,15 @@ export class SSESource {
     this.#connected();
 
     try {
+      this.#resetKeepAliveTimeout();
       for await (const event of abortable(this.#stream, this.#abortController.signal)) {
+        this.#resetKeepAliveTimeout();
         this.dispatch({ type: 'event', ...event });
       }
     } catch (e) {
       this.dispatch({ type: 'error', error: e });
     } finally {
+      clearTimeout(this.#keepAliveTimeout);
       try {
         await this.#stream.cancel();
       } catch (e) {
@@ -214,5 +224,14 @@ export class SSESource {
         return ({ done: true, event: null });
       }
     });
+  }
+
+  #resetKeepAliveTimeout(): void {
+    clearTimeout(this.#keepAliveTimeout);
+    this.#keepAliveTimeout = setTimeout(() => {
+      this.dispatch({ type: 'error', error: new Error('Keep-alive timeout') });
+      this.close();
+      this.#resetKeepAliveTimeout();
+    }, this.#keepAliveTime);
   }
 }

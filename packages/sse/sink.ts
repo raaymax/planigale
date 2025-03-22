@@ -7,8 +7,11 @@ export class SSESink extends EventTarget {
   stream: ReadableStream<SSEEvent>;
   ctl: ReadableStreamDefaultController<SSEEvent> | null = null;
 
-  constructor() {
+  constructor(opts: { keepAliveInterval?: number } = {}) {
     super();
+    if (opts.keepAliveInterval) {
+      this.#keepAliveTime = opts.keepAliveInterval;
+    }
     this.stream = new ReadableStream<SSEEvent>({
       start: (controller) => {
         this.ctl = controller;

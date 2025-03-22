@@ -153,6 +153,18 @@ Deno.test('[SSE] SSESource fail when status is not 200', async () => {
   assertEquals(error.message, 'Unexpected status code: 400');
 });
 
+Deno.test('[SSE] SSESource should error and disconnect on keep-alive timeout', async () => {
+  const sink = new SSESink();
+  const source = new SSESource('http://127.0.0.1/sse', {
+    fetch: async () => sink.toResponse(),
+    keepAliveTimeout: 100,
+  });
+
+  const error = await source.next().then((e) => e).catch((e) => e);
+  assert(error);
+  assertEquals(error.message, 'Keep-alive timeout');
+});
+
 Deno.test('[SSE] SSESource should sent headers from request and from options', async () => {
   const requestInit = new Request('http://127.0.0.1/sse', {
     headers: {
