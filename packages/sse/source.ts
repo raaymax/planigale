@@ -103,7 +103,7 @@ export class SSESource {
     ({ promise: this.connected, resolve: this.#connected, reject: this.#connectionError } = Promise.withResolvers<
       void
     >());
-    opts?.signal?.addEventListener('abort', () => this.#abortController.abort(), { once: true });
+    opts?.signal?.addEventListener('abort', () => this.#abortController.abort(opts?.signal?.reason), { once: true });
     this.#input = input;
     this.#options = options;
     if (opts?.keepAliveTimeout) {
