@@ -117,7 +117,7 @@ export class SSESource {
 
   async close(): Promise<void> {
     clearTimeout(this.#keepAliveTimeout);
-    this.#abortController.abort("SSE source closed");
+    this.#abortController.abort('SSE source closed');
     await this.connected.catch(() => {});
     await this.#closed;
   }
