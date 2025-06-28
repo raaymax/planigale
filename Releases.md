@@ -1,3 +1,9 @@
+### 2025.06.28
+
+#### @planigale/sse 0.2.7 (patch)
+
+- fix(sse): signal aborted without reason (#26)
+
 ### 2025.03.22
 
 #### @planigale/sse 0.2.6 (patch)
